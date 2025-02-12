@@ -1,4 +1,4 @@
-## TEMPORARY README ##
+## TEMPORARY README
 ## ALGO BOWL S25- "Teamname" 
 ### Ty Gazaway, Thomas Dowd, TEMPLATE TEAMATE
 
