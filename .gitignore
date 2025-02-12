@@ -1,1 +1,7 @@
 *.class
+*.swp
+.settings/
+.metadata
+.DS_Store
+.gitignore.swp
+
