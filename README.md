@@ -2,6 +2,10 @@
 ## ALGO BOWL S25- "Teamname" 
 ### Ty Gazaway, Thomas Dowd, TEMPLATE TEAMATE
 
+<br>
+https://www.chiark.greenend.org.uk/~sgtatham/puzzles/js/tents.html
+<br>
+
 ### Helpful Git Commands:
 <b>Publishing a Branch:</b><br>
 1. ```git add .``` 
