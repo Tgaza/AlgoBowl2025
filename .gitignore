@@ -1,7 +1,14 @@
+# File Types
 *.class
 *.swp
-.settings/
-.metadata
-.DS_Store
-.gitignore.swp
+*.o
+*.exe
+*.log
 
+# Folders
+.settings/
+.metadata/
+.bin/
+
+# macOS-specific
+.DS_Store
