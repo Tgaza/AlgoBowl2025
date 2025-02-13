@@ -1,0 +1,17 @@
+
+Team Setup{
+    
+}
+
+Input creation{
+
+}
+
+
+Solving{
+
+}
+
+Verifying{
+
+}
