@@ -1,1 +1,14 @@
+# File Types
 *.class
+*.swp
+*.o
+*.exe
+*.log
+
+# Folders
+.settings/
+.metadata/
+.bin/
+
+# macOS-specific
+.DS_Store
