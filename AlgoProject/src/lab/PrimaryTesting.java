@@ -9,7 +9,8 @@
 package lab;
 
 /**
- * 
+ * Potential Algo's to help here:
+ * 	Munkres Assignment Algorithm (Hungarian Algorithm?)
  */
 public class PrimaryTesting {
 
