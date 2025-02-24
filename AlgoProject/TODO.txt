@@ -10,7 +10,14 @@ Gamplan{
         Input Generation/creation{
             TODO: First thing to do is this one
             TODO: Identify how we want make our Input
-            TODO: Input Generator
+
+            TODO: Reconvene at next meeting
+            TODO: Add Comments in Input generator -Thomas
+            TODO: Verify Calculate Tent Target 
+            TODO: Potentially add HashMaps to Input Generator
+            TODO: Push Files created to a file.
+            TODO: Finish Input Generator.
+            TODO: Verify prospective proeedurally generated inputs.
         }->Verification{
             TODO: Identify what makes a valid OUTPUT
             TODO: Brainstorm how to Identify Invalid outputs and edge cases
