@@ -80,7 +80,7 @@ public class InputGenerator {
 
 		//generate number of tents for the row and columns
 		for(int i = 0; i < rows; i++) {
-			int maxTents = Math.max(0, rows - treeRowCount[i]); 			 // Ensure non-negative value 
+			int maxTents = Math.max(0, columns - treeRowCount[i]); 			 // Ensure non-negative value 
 			int randomInt = (maxTents > 0) ? rand.nextInt(maxTents + 1) : 0; // Allow 0 as a possibility
 			rowTents[i] = randomInt;
 			System.out.print(randomInt + " ");
@@ -90,6 +90,7 @@ public class InputGenerator {
 		System.out.println();
 
 		for(int i = 0; i < columns; i++) {
+			int maxTents = Math.max(0, rows - treeColCount[i]);
 			int randomInt = rand.nextInt(rows - treeColCount[i]);
 			columnTents[i] = randomInt;
 			System.out.print(randomInt + " ");
