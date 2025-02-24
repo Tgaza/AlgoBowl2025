@@ -1,8 +1,6 @@
 
 Team NullPointerException Setup{
     Meeting Dates{
-        TODO: Meet on Sunday 16th, Noon, where: PT at first
-        TODO: Decide further meeting dates on Sunday 16th
     }
     TODO: GamePlan creation
 }
@@ -12,9 +10,7 @@ Gamplan{
         Input Generation/creation{
             TODO: First thing to do is this one
             TODO: Identify how we want make our Input
-            TODO: Ty and John: Generation
-            TODO: Thomas: Creation
-            TODO: Reconvene at next meeting
+            TODO: Input Generator
         }->Verification{
             TODO: Identify what makes a valid OUTPUT
             TODO: Brainstorm how to Identify Invalid outputs and edge cases
