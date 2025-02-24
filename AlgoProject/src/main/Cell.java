@@ -1,0 +1,78 @@
+package main;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Cell {
+	private int row, col;
+	private char symbol;
+	private boolean isTree;
+	private boolean isTent;
+
+	private ArrayList<Cell> diagAdjList;
+	private ArrayList<Cell> cardinalAdjList;
+
+	public Cell(int row, int col) {
+		this.row = row;
+		this.col = col;
+		this.symbol = '.';
+		this.isTree = false;
+		this.isTent = false;
+		this.diagAdjList = new ArrayList<>();
+		this.cardinalAdjList = new ArrayList<>();
+	}
+
+	public void updateCardinalAdjList(Cell adjCell) {
+		this.cardinalAdjList.add(adjCell);
+	}
+
+	public void updateDiagAdjList(Cell adjCell) {
+		this.diagAdjList.add(adjCell);
+	}
+
+	public List<Cell> getDiagAdjList() {
+		return this.diagAdjList;
+	}
+
+	public List<Cell> getCardinalAdjList() {
+		return this.cardinalAdjList;
+	}
+
+	public void setSymbol(char symbol) {
+		this.symbol = symbol;
+		switch(symbol) {
+		case '.':
+			this.isTree = false;
+			this.isTent = false;
+			break;
+		case 'T':
+			this.isTree = true;
+			this.isTent = false;
+			break;
+		case '^':
+			this.isTree = false;
+			this.isTent = true;
+			break;
+		}
+	}
+
+	public boolean isTree() {
+		return this.isTree;
+	}
+
+	public boolean isTent() {
+		return this.isTent;
+	}
+
+	public int getRow() {
+		return this.row;
+	}
+
+	public int getCol() {
+		return this.col;
+	}
+
+	public char getSymbol() {
+		return this.symbol;
+	}
+}

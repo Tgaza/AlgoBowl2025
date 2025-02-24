@@ -18,7 +18,7 @@ public class InputGenerator {
 	// Tweakable Values
 	private int rows = 15;
 	private int columns = 35;
-	private static final double LAMBDA = 0.0005;
+	private static final double DENSITY = 0.3;
 
 	// Non-tweakable values
 	private int[] rowTents = new int[rows];
@@ -29,11 +29,22 @@ public class InputGenerator {
 
 	public Random rand = new Random();
 
-	public static boolean shouldPlaceTree(int n, int m) {
-		int numTiles = n * m;
-		double probability = 1 - Math.exp(-LAMBDA * numTiles);
+	public static boolean densityCheck() {
 		Random random = new Random();
-		return random.nextDouble() < probability; // Returns true if a tree should be placed
+		boolean densityCheck = random.nextDouble() < DENSITY;
+		return densityCheck; // Returns true if a tree should be placed
+	}
+	
+	public char[] availableTentSpots(int row, int col) {
+		boolean checkConditions = true;
+		boolean checkEdgeCases = true;
+		char[] availableSpots = new char[] {'X','X','X','X'};
+		//Check for conditions where placing a tent would create an unavoidable violation
+		//Also check for edge cases where a tree shouldn't be placed
+		if(row-1 > 0 && gameGrid[row-1][col] == '.') {
+			
+		}
+		return availableSpots; // Returns true if a tree should be placed
 	}
 
 	public InputGenerator() {
@@ -41,7 +52,7 @@ public class InputGenerator {
 		for(int row = 0; row < rows; row++) {
 			for(int column = 0; column < columns; column++) {
 				//kind of the heuristic for determining the density of trees on the graph
-				boolean place = shouldPlaceTree(rows, columns);
+				boolean place = densityCheck(rows, columns);
 				if(place) {
 					gameGrid[row][column] = 'T';
 					treeRowCount[row]++;
