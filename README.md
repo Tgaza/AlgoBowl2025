@@ -1,6 +1,6 @@
 ## TEMPORARY README
 ## ALGO BOWL S25- "Teamname" 
-### Ty Gazaway, Thomas Dowd, TEMPLATE TEAMATE
+### Ty Gazaway, Thomas Dowd, John Silva
 
 <br>
 https://www.chiark.greenend.org.uk/~sgtatham/puzzles/js/tents.html
