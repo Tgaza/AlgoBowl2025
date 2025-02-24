@@ -11,8 +11,14 @@ package main;
 import java.util.Random;
 
 /**
- * Creates procedurally inputs for Tents.
- * TODO: Double Check all outputs for viability.
+ * Procedurally Generates Inputs<br>
+ * 
+ * 'T' = <i>Tree</i> <br>
+ * '.' = <i>AvailableLocation</i> <br>
+ * '^' = <i>Tent</i> <br>
+ * 
+ * TODO: Double Check all outputs for viability <br>
+ * TODO: Remove all unused variables <br>
  */
 public class InputGenerator {
 	// Tweakable Values
@@ -29,20 +35,20 @@ public class InputGenerator {
 
 	public Random rand = new Random();
 
-	public static boolean densityCheck() {
+	public static boolean densityCheck(int rows2, int columns2) {
 		Random random = new Random();
 		boolean densityCheck = random.nextDouble() < DENSITY;
 		return densityCheck; // Returns true if a tree should be placed
 	}
 	
 	public char[] availableTentSpots(int row, int col) {
-		boolean checkConditions = true;
+		boolean checkConditions = true; 
 		boolean checkEdgeCases = true;
 		char[] availableSpots = new char[] {'X','X','X','X'};
 		//Check for conditions where placing a tent would create an unavoidable violation
 		//Also check for edge cases where a tree shouldn't be placed
 		if(row-1 > 0 && gameGrid[row-1][col] == '.') {
-			
+			// FIXME: Whats supposed to go here???
 		}
 		return availableSpots; // Returns true if a tree should be placed
 	}

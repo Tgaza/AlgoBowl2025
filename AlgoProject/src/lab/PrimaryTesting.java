@@ -1,6 +1,6 @@
 /**
  * Testing Area for the algorithm
- * "{InsertTeamName}"
+ * "NullPntrException"
  * @author Ty Gazaway
  * @author John Silva 
  * @author Thomas Dowd
