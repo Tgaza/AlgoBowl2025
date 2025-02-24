@@ -1,8 +1,18 @@
+/**
+ * "NullPntrException"
+ * @author Ty Gazaway
+ * @author John Silva 
+ * @author Thomas Dowd
+ * 
+ */
 package main;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ */
 public class Cell {
 	private int row, col;
 	private char symbol;

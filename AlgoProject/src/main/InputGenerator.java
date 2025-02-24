@@ -13,8 +13,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Creates procedurally inputs for Tents. TODO: Double Check all outputs for
- * viability.
+ * Procedurally Generates Inputs<br>
+ * 
+ * 'T' = <i>Tree</i> <br>
+ * '.' = <i>AvailableLocation</i> <br>
+ * '^' = <i>Tent</i> <br>
+ * 
+ * TODO: Double Check all outputs for viability <br>
+ * TODO: Remove all unused variables <br>
  */
 public class InputGenerator {
 	// Tweakable Values
@@ -31,6 +37,7 @@ public class InputGenerator {
 
 	// Helper attributes/classes
 	private Random rand = new Random();
+
 
 	public static void main(String[] args) {
 		final int ROWS = 300;
@@ -53,7 +60,6 @@ public class InputGenerator {
 		this.inaccuracy = inaccuracy;
 		this.rowTents = new int[rows];
 		this.colTents = new int[cols];
-		this.gameGrid = new GameGrid(rows, cols);
 	}
 
 	public void generateInput() {
