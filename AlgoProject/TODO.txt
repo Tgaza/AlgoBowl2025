@@ -15,6 +15,10 @@ Gamplan{
             TODO: Ty and John: Generation
             TODO: Thomas: Creation
             TODO: Reconvene at next meeting
+            TODO: Add Comments in Input generator -Thomas
+            TODO: Verify Calculate Tent Target 
+            TODO: Potentially add HashMaps to Input Generator
+            TODO: Push Files created to a file.
         }->Verification{
             TODO: Identify what makes a valid OUTPUT
             TODO: Brainstorm how to Identify Invalid outputs and edge cases
