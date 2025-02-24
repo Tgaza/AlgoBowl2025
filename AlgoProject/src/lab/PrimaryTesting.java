@@ -20,6 +20,7 @@ public class PrimaryTesting {
 	public static void main(String[] args) {
 //		TODO: Add Testing
 //		TODO: Link to Junit
+		System.out.println("Testing");
 	}
 
 }
