@@ -31,6 +31,11 @@ public class Cell {
 		this.diagAdjList = new ArrayList<>();
 		this.cardinalAdjList = new ArrayList<>();
 	}
+	
+	@Override
+	public String toString() {
+		return "" + this.symbol;
+	}
 
 	public void updateCardinalAdjList(Cell adjCell) {
 		this.cardinalAdjList.add(adjCell);
