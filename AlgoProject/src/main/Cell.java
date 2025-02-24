@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Grid Node. 
  * 
  */
 public class Cell {
@@ -21,7 +22,12 @@ public class Cell {
 
 	private ArrayList<Cell> diagAdjList;
 	private ArrayList<Cell> cardinalAdjList;
-
+	
+	/**
+	 * Constructor
+	 * @param row
+	 * @param col
+	 */
 	public Cell(int row, int col) {
 		this.row = row;
 		this.col = col;
