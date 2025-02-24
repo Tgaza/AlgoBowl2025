@@ -20,7 +20,9 @@ public class InputGenerator {
 	// Tweakable Values
 	private int rows;
 	private int cols;
-	private double density;
+	private double solvDensity;
+	private double screwoverDensity;
+	private double inaccuracy;
 
 	// Non-tweakable values
 	private int[] rowTents;
@@ -33,17 +35,22 @@ public class InputGenerator {
 	public static void main(String[] args) {
 		final int ROWS = 300;
 		final int COLS = 300;
-		final double DENSITY = 0.15;
-		InputGenerator genny = new InputGenerator(ROWS, COLS, DENSITY);
+		final double SOLVABLE_DENSITY = 0.15;
+		final double SCREWOVER_DENSITY = 0.05;
+		final double INNACCURACY = 0.30;
+		final boolean SHOW_TENTS = true;
+		InputGenerator genny = new InputGenerator(ROWS, COLS, SOLVABLE_DENSITY, SCREWOVER_DENSITY, INNACCURACY);
 		genny.generateInput();
-		genny.outputToFile();
-		//genny.printGrid();
+		genny.outputToFile(SHOW_TENTS);
+		//genny.printGrid(SHOW_TENTS);
 	}
 
-	public InputGenerator(int rows, int cols, double density) {
+	public InputGenerator(int rows, int cols, double solvDensity, double screwoverDensity, double inaccuracy) {
 		this.rows = rows;
 		this.cols = cols;
-		this.density = density;
+		this.solvDensity = solvDensity;
+		this.screwoverDensity = screwoverDensity;
+		this.inaccuracy = inaccuracy;
 		this.rowTents = new int[rows];
 		this.colTents = new int[cols];
 		this.gameGrid = new GameGrid(rows, cols);
@@ -57,8 +64,8 @@ public class InputGenerator {
 				if (curCell.isTree() || curCell.isTent()) {
 					continue;
 				}
-				// kind of the heuristic for determining the density of trees on the graph
-				boolean place = densityCheck();
+				// kind of the heuristic for determining the solvDensity of trees on the graph
+				boolean place = solvDensityCheck();
 				Cell pairedTent = pickTent(this.gameGrid.calculateTentTargets(curCell));
 				if (place && pairedTent != null) {
 					curCell.setSymbol('T');
@@ -70,8 +77,41 @@ public class InputGenerator {
 		}
 	}
 
-	public boolean densityCheck() {
-		return this.rand.nextDouble() < this.density; // Returns true if a tree should be placed for the density
+	public void parameterizeInput() {
+		// Add in screwover trees at specified density
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				Cell curCell = this.gameGrid.getCell(row, col);
+				if (curCell.isTree()) {
+					continue;
+				}
+				// kind of the heuristic for determining the solvDensity of trees on the graph
+				boolean place = screwoverDensityCheck();
+				if (place) {
+					curCell.setSymbol('T');
+				}
+			}
+		}
+
+		// Modify row and col values by innaccuracy parrameter
+		for (int row = 0; row < rows; row++) {
+			this.rowTents[row] += Math.pow(-1, row % 2)
+					* (int) (this.rowTents[row] * this.rand.nextDouble() * this.inaccuracy);
+		}
+
+		for (int col = 0; col < cols; col++) {
+			this.colTents[col] += Math.pow(-1, col % 2)
+					* (int) (this.colTents[col] * this.rand.nextDouble() * this.inaccuracy);
+		}
+	}
+
+	public boolean solvDensityCheck() {
+		return this.rand.nextDouble() < this.solvDensity; // Returns true if a tree should be placed for the solvDensity
+	}
+
+	public boolean screwoverDensityCheck() {
+		return this.rand.nextDouble() < this.screwoverDensity; // Returns true if a tree should be placed for the
+																// solvDensity
 	}
 
 	public Cell pickTent(List<Cell> availableTentSpots) {
@@ -81,7 +121,7 @@ public class InputGenerator {
 		return availableTentSpots.get(this.rand.nextInt(0, availableTentSpots.size()));
 	}
 
-	public void printGrid() {
+	public void printGrid(boolean showTents) {
 		System.out.println(this.rows + " " + this.cols);
 		for (int row = 0; row < this.rows; row++) {
 			System.out.print(rowTents[row] + " ");
@@ -94,14 +134,18 @@ public class InputGenerator {
 		// print out generated grid
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
-				System.out.print(this.gameGrid.getCell(row, col) + " ");
+				String symbol = this.gameGrid.getCell(row, col).toString();
+				if (!showTents && symbol.equals("^")) {
+					symbol = ".";
+				}
+				System.out.print(symbol + " ");
 			}
 			System.out.println();
 		}
 	}
 
-	public void outputToFile() {
-		try(FileWriter writer = new FileWriter("data/generatedInputsUnverified/gen1.txt")) {
+	public void outputToFile(boolean showTents) {
+		try (FileWriter writer = new FileWriter("data/generatedInputsUnverified/gen2_postparams_withTents.txt")) {
 			writer.write(this.rows + " " + this.cols + "\n");
 			for (int row = 0; row < this.rows; row++) {
 				writer.write(rowTents[row] + " ");
@@ -114,7 +158,11 @@ public class InputGenerator {
 			// print out generated grid
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
-					writer.write(this.gameGrid.getCell(row, col) + " ");
+					String symbol = this.gameGrid.getCell(row, col).toString();
+					if (!showTents && symbol.equals("^")) {
+						symbol = ".";
+					}
+					writer.write(symbol + " ");
 				}
 				writer.write("\n");
 			}
