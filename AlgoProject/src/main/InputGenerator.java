@@ -31,9 +31,9 @@ public class InputGenerator {
 	private Random rand = new Random();
 
 	public static void main(String[] args) {
-		final int ROWS = 25;
-		final int COLS = 35;
-		final double DENSITY = 0.2;
+		final int ROWS = 300;
+		final int COLS = 300;
+		final double DENSITY = 0.15;
 		InputGenerator genny = new InputGenerator(ROWS, COLS, DENSITY);
 		genny.generateInput();
 		genny.outputToFile();

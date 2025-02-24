@@ -29,19 +29,19 @@ public class GameGrid {
 	private void initializeAdjLists() {
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
-				if (row - 1 > 0) {
+				if (row - 1 >= 0) {
 					this.grid[row][col].updateCardinalAdjList(this.grid[row - 1][col]);
 					this.grid[row - 1][col].updateCardinalAdjList(this.grid[row][col]);
 				}
-				if (col - 1 > 0) {
+				if (col - 1 >= 0) {
 					this.grid[row][col].updateCardinalAdjList(this.grid[row][col - 1]);
 					this.grid[row][col - 1].updateCardinalAdjList(this.grid[row][col]);
 				}
-				if (row - 1 > 0 && col - 1 > 0) {
+				if (row - 1 >= 0 && col - 1 >= 0) {
 					this.grid[row][col].updateDiagAdjList(this.grid[row - 1][col - 1]);
 					this.grid[row - 1][col - 1].updateDiagAdjList(this.grid[row][col]);
 				}
-				if (row + 1 < rows && col - 1 > 0) {
+				if (row + 1 < rows && col - 1 >= 0) {
 					this.grid[row][col].updateDiagAdjList(this.grid[row + 1][col - 1]);
 					this.grid[row + 1][col - 1].updateDiagAdjList(this.grid[row][col]);
 				}
@@ -56,9 +56,7 @@ public class GameGrid {
 		List<Cell> targets = new ArrayList<>();
 		for (Cell cardinalCell : tree.getCardinalAdjList()) {
 			validCell = true;
-			if (cardinalCell.isTent()) {
-				continue;
-			} else {
+			if (!cardinalCell.isTent()){
 				for (Cell adjCell : cardinalCell.getCardinalAdjList()) {
 					if (adjCell.isTent()) {
 						validCell = false;
@@ -71,9 +69,9 @@ public class GameGrid {
 						break;
 					}
 				}
-			}
-			if (validCell) {
-				targets.add(cardinalCell);
+				if (validCell) {
+					targets.add(cardinalCell);
+				}
 			}
 		}
 		return targets;
