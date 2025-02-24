@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 public class GameGrid {
-	private int rows, cols;
+	private int rows;
+	private int cols;
 	private Cell[][] grid;
 	private Set<Cell> trees;
 	private Set<Cell> tents;
@@ -22,9 +23,10 @@ public class GameGrid {
 		}
 		this.trees = new HashSet<>();
 		this.tents = new HashSet<>();
+		this.initializeAdjLists();
 	}
 
-	public void initializeAdjLists() {
+	private void initializeAdjLists() {
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				if (row - 1 > 0) {
@@ -77,8 +79,7 @@ public class GameGrid {
 		return targets;
 	}
 
-	public void updateCell(int row, int col, char symbol) {
-		Cell cell = this.grid[row][col];
+	public void updateCell(Cell cell, char symbol) {
 		switch (symbol) {
 		case '.':
 			if (cell.isTree()) {
@@ -112,7 +113,7 @@ public class GameGrid {
 	}
 
 	public Cell getCell(int row, int col) {
-		return null;
+		return this.grid[row][col];
 	}
 
 }

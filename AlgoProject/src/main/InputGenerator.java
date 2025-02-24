@@ -7,119 +7,119 @@
  */
 package main;
 
-
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 /**
- * Creates procedurally inputs for Tents.
- * TODO: Double Check all outputs for viability.
+ * Creates procedurally inputs for Tents. TODO: Double Check all outputs for
+ * viability.
  */
 public class InputGenerator {
 	// Tweakable Values
-	private int rows = 15;
-	private int columns = 35;
-	private static final double DENSITY = 0.3;
+	private int rows;
+	private int cols;
+	private double density;
 
 	// Non-tweakable values
-	private int[] rowTents = new int[rows];
-	private int[] columnTents = new int[columns];
-	private char[][] gameGrid = new char[rows][columns];
-	private int[] treeRowCount = new int[rows];
-	private int[] treeColCount = new int[columns];
+	private int[] rowTents;
+	private int[] colTents;
+	private GameGrid gameGrid;
 
-	public Random rand = new Random();
-
-	public static boolean densityCheck() {
-		Random random = new Random();
-		boolean densityCheck = random.nextDouble() < DENSITY;
-		return densityCheck; // Returns true if a tree should be placed
-	}
-	
-	public char[] availableTentSpots(int row, int col) {
-		boolean checkConditions = true;
-		boolean checkEdgeCases = true;
-		char[] availableSpots = new char[] {'X','X','X','X'};
-		//Check for conditions where placing a tent would create an unavoidable violation
-		//Also check for edge cases where a tree shouldn't be placed
-		if(row-1 > 0 && gameGrid[row-1][col] == '.') {
-			
-		}
-		return availableSpots; // Returns true if a tree should be placed
-	}
-
-	public InputGenerator() {
-		//generate spot for a tree or open space for the entire graph
-		for(int row = 0; row < rows; row++) {
-			for(int column = 0; column < columns; column++) {
-				//kind of the heuristic for determining the density of trees on the graph
-				boolean place = densityCheck(rows, columns);
-				if(place) {
-					gameGrid[row][column] = 'T';
-					treeRowCount[row]++;
-					treeColCount[column]++;
-				} else {
-					gameGrid[row][column] = '.';
-				}
-			}
-			System.out.println();
-		}
-
-		//check and make sure that no trees are completed locked in by other trees as that forces a violation
-		// ^^ Maybe we try to make an implementation where we DO have a "Locked In" Tree situation? -TDowd
-		for(int row = 0; row < rows; row++) {
-			for(int col = 0; col < columns; col++) {
-				int blockCount = 0;
-				if(row-1 > 0 && gameGrid[row][col] == 'T') {
-					blockCount++;
-				} else if(row+1 < rows && gameGrid[row][col] == 'T') {
-					blockCount++;
-				} else if(col-1 > 0 && gameGrid[row][col] == 'T') {
-					blockCount++;
-				} else if(col+1 < rows && gameGrid[row][col] == 'T') {
-					blockCount++;
-				}
-
-				if(blockCount == 4) {
-					treeRowCount[row]--;
-					treeColCount[col]--;
-					gameGrid[row][col] = '.';
-				}
-			}
-		}
-
-		//print out the rows and columns of the gameGrid
-		System.out.println(rows + " " + columns);
-
-		//generate number of tents for the row and columns
-		for(int i = 0; i < rows; i++) {
-			int maxTents = Math.max(0, rows - treeRowCount[i]); 			 // Ensure non-negative value 
-			int randomInt = (maxTents > 0) ? rand.nextInt(maxTents + 1) : 0; // Allow 0 as a possibility
-			rowTents[i] = randomInt;
-			System.out.print(randomInt + " ");
-		}
-
-		//print out a newline to separate the rows and columns
-		System.out.println();
-
-		for(int i = 0; i < columns; i++) {
-			int randomInt = rand.nextInt(rows - treeColCount[i]);
-			columnTents[i] = randomInt;
-			System.out.print(randomInt + " ");
-		}
-
-		System.out.println();
-
-		//print out generated grid
-		for(int row = 0; row < rows; row++) {
-			for(int column = 0; column < columns; column++) {
-				System.out.print(gameGrid[row][column] + " ");
-			}
-			System.out.println();
-		}
-
-	}
+	// Helper attributes/classes
+	private Random rand = new Random();
 
 	public static void main(String[] args) {
-		new InputGenerator();
+		final int ROWS = 25;
+		final int COLS = 35;
+		final double DENSITY = 0.2;
+		InputGenerator genny = new InputGenerator(ROWS, COLS, DENSITY);
+		genny.generateInput();
+		genny.outputToFile();
+		//genny.printGrid();
+	}
+
+	public InputGenerator(int rows, int cols, double density) {
+		this.rows = rows;
+		this.cols = cols;
+		this.density = density;
+		this.rowTents = new int[rows];
+		this.colTents = new int[cols];
+		this.gameGrid = new GameGrid(rows, cols);
+	}
+
+	public void generateInput() {
+		// generate spot for a tree or open space for the entire graph
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				Cell curCell = this.gameGrid.getCell(row, col);
+				if (curCell.isTree() || curCell.isTent()) {
+					continue;
+				}
+				// kind of the heuristic for determining the density of trees on the graph
+				boolean place = densityCheck();
+				Cell pairedTent = pickTent(this.gameGrid.calculateTentTargets(curCell));
+				if (place && pairedTent != null) {
+					curCell.setSymbol('T');
+					pairedTent.setSymbol('^');
+					this.rowTents[pairedTent.getRow()] += 1;
+					this.colTents[pairedTent.getCol()] += 1;
+				}
+			}
+		}
+	}
+
+	public boolean densityCheck() {
+		return this.rand.nextDouble() < this.density; // Returns true if a tree should be placed for the density
+	}
+
+	public Cell pickTent(List<Cell> availableTentSpots) {
+		if (availableTentSpots.isEmpty()) {
+			return null;
+		}
+		return availableTentSpots.get(this.rand.nextInt(0, availableTentSpots.size()));
+	}
+
+	public void printGrid() {
+		System.out.println(this.rows + " " + this.cols);
+		for (int row = 0; row < this.rows; row++) {
+			System.out.print(rowTents[row] + " ");
+		}
+		System.out.println();
+		for (int col = 0; col < this.cols; col++) {
+			System.out.print(colTents[col] + " ");
+		}
+		System.out.println();
+		// print out generated grid
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				System.out.print(this.gameGrid.getCell(row, col) + " ");
+			}
+			System.out.println();
+		}
+	}
+
+	public void outputToFile() {
+		try(FileWriter writer = new FileWriter("data/generatedInputsUnverified/gen1.txt")) {
+			writer.write(this.rows + " " + this.cols + "\n");
+			for (int row = 0; row < this.rows; row++) {
+				writer.write(rowTents[row] + " ");
+			}
+			writer.write("\n");
+			for (int col = 0; col < this.cols; col++) {
+				writer.write(colTents[col] + " ");
+			}
+			writer.write("\n");
+			// print out generated grid
+			for (int row = 0; row < rows; row++) {
+				for (int col = 0; col < cols; col++) {
+					writer.write(this.gameGrid.getCell(row, col) + " ");
+				}
+				writer.write("\n");
+			}
+		} catch (Exception e) {
+			System.out.println("failed to output to file, msg- " + e.getMessage());
+		}
 	}
 }
