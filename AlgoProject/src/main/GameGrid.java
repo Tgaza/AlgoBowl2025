@@ -13,6 +13,12 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * 2D Game Board.<br>
+ * 
+ * See also: <br>
+ * {@link Cell}
+ */
 public class GameGrid {
 	private int rows;
 	private int cols;
