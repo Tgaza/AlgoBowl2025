@@ -1,0 +1,52 @@
+
+Team NullPointerException Setup{
+    Meeting Dates{
+        TODO: Meet on Sunday 16th, Noon, where: PT at first
+        TODO: Decide further meeting dates on Sunday 16th
+    }
+    TODO: GamePlan creation
+}
+
+Gamplan{
+    Flow{
+        Input Generation/creation{
+            TODO: First thing to do is this one
+            TODO: Identify how we want make our Input
+            TODO: Ty and John: Generation
+            TODO: Thomas: Creation
+            TODO: Reconvene at next meeting
+        }->Verification{
+            TODO: Identify what makes a valid OUTPUT
+            TODO: Brainstorm how to Identify Invalid outputs and edge cases
+            TODO: Attempt to create Verifyiers
+            TODO: Attempt to break each others Verifyiers
+        }->Input{
+            TODO: Figure out an Input class to read and store data
+        }->Interpret{
+            TODO: Figure out how we want to store each tile/Cell
+            TODO: Figure out how we want to structure the container for the nodes
+        }->Solve{
+            TODO: Identify possible approaches
+            TODO: Each pick an approaches to attempt to create
+            TODO: Attempt to create solvers and discuss issues, successes, etc.
+        }->Verify output{
+            TODO: Use verifyier to validate out solutions
+            TODO: Store Valid solutions
+            TODO: Go back to Solve and attempt to improve solver, then repeat previous
+        }
+    }
+}
+
+Input creation{
+    TODO: Is due by monday at 10pm (2/24)
+}
+
+
+Solving{
+    TODO: OUTPUT is due by Thursday at 10pm (2/27)
+}
+
+Verifying{
+    TODO: Verification is due by Friday at 10pm (2/28)
+}
+
