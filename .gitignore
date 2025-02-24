@@ -4,7 +4,8 @@
 *.o
 *.exe
 *.log
-
+*.project
+*.classpath
 
 # Folders
 .settings/
