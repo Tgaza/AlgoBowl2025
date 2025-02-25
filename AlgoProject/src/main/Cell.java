@@ -23,6 +23,9 @@ public class Cell {
 	private ArrayList<Cell> diagAdjList;
 	private ArrayList<Cell> cardinalAdjList;
 	
+	//this was added to track the tent(s) associated with tree(s) and vice versa
+	private List<Cell> pairedCells;
+	
 	/**
 	 * Constructor
 	 * @param row
@@ -36,6 +39,7 @@ public class Cell {
 		this.isTent = false;
 		this.diagAdjList = new ArrayList<>();
 		this.cardinalAdjList = new ArrayList<>();
+		this.pairedCells = new ArrayList<>();
 	}
 	
 	@Override
@@ -57,6 +61,14 @@ public class Cell {
 
 	public List<Cell> getCardinalAdjList() {
 		return this.cardinalAdjList;
+	}
+	
+	public void addPairedCell(Cell pairCell) {
+		this.pairedCells.add(pairCell);
+	}
+	
+	public List<Cell> getPairedCells() {
+		return this.pairedCells;
 	}
 
 	public void setSymbol(char symbol) {
