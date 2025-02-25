@@ -62,16 +62,16 @@ public class InputGenerator {
 		// ~ ~ ~ Adjustable Params ~ ~ ~ //
 		
 		// Creation Params
-		final int ROWS = 300;
-		final int COLS = 300;
-		final double SOLVABLE_DENSITY = 0.15;
-		final double SCREWOVER_DENSITY = 0.05;
-		final double INNACCURACY = 0.30;
-		final boolean SHOW_TENTS = true;
+		final int ROWS = 30000;
+		final int COLS = 3;
+		final double SOLVABLE_DENSITY = 0.25;
+		final double SCREWOVER_DENSITY = 0.10;
+		final double INNACCURACY = 0.40;
+		final boolean SHOW_TENTS = false;
 		// Output Params 
 		final boolean PRINT_TO_TERMINAL = false;
 		// File Name Params
-		final int INDICATOR_CURRENT_GEN = 3;
+		final int INDICATOR_CURRENT_GEN = 4;
 		final String INDICATOR_PARAM = "post"; // dunno what "PreParams and PostParams" mean
 		final String SPECIAL_FLAG = null; // Can be null, or empty
 		
@@ -257,7 +257,7 @@ public class InputGenerator {
 					if (!showTents && symbol.equals("^")) {
 						symbol = ".";
 					}
-					writer.write(symbol + " ");
+					writer.write(symbol);
 				}
 				writer.write("\n");
 			}
