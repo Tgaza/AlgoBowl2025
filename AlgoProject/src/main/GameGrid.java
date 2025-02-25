@@ -115,6 +115,33 @@ public class GameGrid {
 		}
 		cell.setSymbol(symbol);
 	}
+	
+	//overload of update cell to allow row and col input
+	public void updateCell(int row, int col, char symbol) {
+		Cell cell = this.grid[row][col];
+		switch (symbol) {
+		case '.':
+			if (cell.isTree()) {
+				this.trees.remove(cell);
+			} else if (cell.isTent()) {
+				this.tents.remove(cell);
+			}
+			break;
+		case 'T':
+			if (cell.isTent()) {
+				this.tents.remove(cell);
+			}
+			this.trees.add(cell);
+			break;
+		case '^':
+			if (cell.isTree()) {
+				this.trees.remove(cell);
+			}
+			this.tents.add(cell);
+			break;
+		}
+		cell.setSymbol(symbol);
+	}
 
 	public Set<Cell> getTrees() {
 		return this.trees;

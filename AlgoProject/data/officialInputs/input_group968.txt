@@ -1,0 +1,28 @@
+25 25
+11 11 11 10 11 11 11 10 11 11 11 11 11 10 11 11 11 11 11 11 11 11 11 11 11
+11 10 11 11 11 11 11 11 11 11 11 10 11 11 11 11 11 11 11 11 11 10 11 11 11
+T..T..T.T..TT..T..T.T.T..
+.T.TTT...T.T.T.T..T..T...
+TT..T.T.TT..T..T.T.T.T.T.
+.T..TT...T.T..TT...T.T..T
+T.T.T.T.T.T.T.T.T.T.T.T.T
+..TT.T.T...T...T.T.T.TT..
+T...T.T.T.T...T.T.T.T...T
+.T.T..TT..T...T.T.TT..T..
+T.T..T...T.T.T.T.T..T...T
+..T.TT...T.T.TT..T..T.T.T
+T..T..T.TT..T..T.T.T.T.TT
+.T.T.T..T..T.TT..T.T.T...
+T.T.T..T..T.T.T..TT.T...T
+..T..T...T.T.T.T...T.TT..
+T.TT..T.T.T...T.TT..T.T..
+.T.T.T.TT.T.T.T...T.TT...
+T..T..T.T.T...T.T.T..T...
+..T.TT...T.T.TT..T.T.T.T.
+T.T..T.T.T..T..T.TT.T...T
+.T.TT..T..T...T.T.T.T.T.T
+T..T..T.TT.T...T.TT..T...
+.T.T.T..T..T.T.TT.T...T..
+T.T.T..T..T.TT.T...T.T.T.
+..T..T...T.TT..T..T.T.T..
+T.TT..T.T.T.T.T.T.T.TT...

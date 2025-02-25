@@ -1,0 +1,13 @@
+10 10
+0 3 2 2 2 1 2 2 1 0
+2 1 2 2 2 1 2 2 1 2
+T...T...T.
+.TT.TT.TT.
+..T...T...
+TT.TTT.TTT
+.T...T...T
+..T.T.T...
+.TT.TT.TT.
+T...T...T.
+.TT.TT.TT.
+T.TT.TT.TT
