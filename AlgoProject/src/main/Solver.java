@@ -77,9 +77,9 @@ public class Solver {
 	private Random rand = new Random();
 
 	public static void main(String[] args) {
-		String inputFileName = "test8x8_1.txt";
-		String inputFileFolder = "testingInputs";
-		String outputFileName = "test8x8_1_Solver_attempt_1.txt";
+		String inputFileName = "input_group991.txt";
+		String inputFileFolder = "officialInputs";
+		String outputFileName = "output_group991_attempt_1.txt";
 		String outputFileFolder = "testingOutputFiles";
 		String inputFile = inputFileFolder + "/" + inputFileName;
 		String outputFile = outputFileFolder + "/" + outputFileName;
@@ -88,7 +88,6 @@ public class Solver {
 		solvee.calcInitialViolationCount();
 		solvee.generateInitialSol();
 		solvee.printGrid();
-		solvee.printCurOutput();
 		solvee.curOutputToFile(outputFile);
 		
 		Verifier very = new Verifier(inputFile, outputFile);
@@ -132,7 +131,6 @@ public class Solver {
 			Cell changeCell = adjCells.get(cellToAdjust);
 			int violationChange = calcViolationChange(changeCell, tree);
 			this.curViolationCount += violationChange;
-			System.out.println(violationChange);
 			adjustCell(changeCell, tree);
 		}
 	}
@@ -364,13 +362,11 @@ public class Solver {
 			sc.nextLine();
 			for (int row = 0; row < this.rows; row++) {
 				String line = sc.nextLine();
-				System.out.println(line);
 				for (int col = 0; col < this.cols; col++) {
 					this.gameGrid.updateCell(row, col, line.charAt(col));
 				}
 			}
 			System.out.println("Input read successfully");
-			this.printGrid();
 		} catch (IOException e) {
 			System.out.println("failed to read from file, msg- " + e.getMessage());
 		}
