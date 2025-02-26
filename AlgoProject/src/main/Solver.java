@@ -78,24 +78,38 @@ public class Solver {
 
 	public static void main(String[] args) {
 
-		String inputFileName = "input_group991.txt";
-		String inputFileFolder = "officialInputs";
-		String outputFileName = "output_group991_attempt_1.txt";
+		String inputFileFolder = "AlgoBowl/testingInputs";
+		String outputFileFolder = "AlgoBowl/testingOutputFiles";
+		
+		
+		
+		
+			for (int i = 963; i < 1025; i++) {
+				
+				try {
+					String inputFileName = "input_group" + i + ".txt";
+					String outputFileName = inputFileFolder.replace(".txt", "_Solved.txt");
 
-		String outputFileFolder = "testingOutputFiles";
+					String inputFile = inputFileFolder + "/" + inputFileName;
+					String outputFile = outputFileFolder + "/" + outputFileName;
+
+					//Solver solvee = new Solver();
+					//solvee.readInput(inputFile);
+					//solvee.calcInitialViolationCount();
+					//solvee.generateInitialSol();
+					//solvee.printGrid();
+					//solvee.curOutputToFile(outputFile);
+					//				
+					//Verifier very = new Verifier(inputFile, outputFile);
+
+					System.out.println("Processed File: " + inputFile + " -> " + outputFile);
+				} catch (Exception e) {
+					System.out.println("Skipped File");
+				}
+				
+			}
+		}
 		
-		String inputFile = inputFileFolder + "/" + inputFileName;
-		String outputFile = outputFileFolder + "/" + outputFileName;
-		
-		Solver solvee = new Solver();
-		solvee.readInput(inputFile);
-		solvee.calcInitialViolationCount();
-		solvee.generateInitialSol();
-		solvee.printGrid();
-		solvee.curOutputToFile(outputFile);
-		
-		Verifier very = new Verifier(inputFile, outputFile);
-	}
 
 	public Solver() {
 		this.rows = -1;
@@ -299,7 +313,11 @@ public class Solver {
 			System.out.println((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir);
 		}
 	}
-
+	
+	/**
+	 * deprecated method, remove all instances 
+	 * @param outputFile
+	 */
 	public void curOutputToFile(String outputFile) {
 		try (FileWriter writer = new FileWriter("data/" + outputFile)) {
 			writer.write(this.curViolationCount + "\n");
