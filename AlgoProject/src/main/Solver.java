@@ -19,8 +19,8 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * -TODO: Create new Offical Folder to pull solutions/Inputfiles from -TODO:
- * Ensure one indexed output !!!
+ * -TODO: Create new Offical Folder to pull solutions/Inputfiles from 
+ * -TODO: Ensure one indexed output !!!
  * 
  * VVV Output requirments VVV 
  * -TODO: Incorect num of violations <- INVALID
@@ -36,7 +36,8 @@ import java.util.Set;
  * violation for each tent to many or too few<- Violation
  * 
  * VVV Solving ideas/methods VVV
- * 
+ * MUST BE 1 Indexed;
+ * (ROW,COL)
  * When complete, "todo" -> "fixme"
  */
 public class Solver {

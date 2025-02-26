@@ -64,8 +64,8 @@ public class Verifier {
 	public Verifier(String inputFile, String outputFile) {
 		super();
 		//for the time being the arguments are being left out intentionally
-		this.inputFile = "data/officialInputs/input_group1001.txt";
-		this.outputFile = "data/officialOutputs/output_group1001_NullPntrException.txt";
+		this.inputFile = "data/officialInputs/" + inputFile;
+		this.outputFile = "data/officialOutputs/" + outputFile;
 		readInput();
 		
 		//check to make sure the number of tents match
@@ -89,7 +89,7 @@ public class Verifier {
 //		System.out.println(columnViolations);
 //		System.out.println(adjViolations);
 //		System.out.println(pairViolations);
-//		System.out.println(totalViolations);
+		System.out.println(totalViolations);
 		
 		if(totalViolations != claimedViolations) {
 			exitProgram();
