@@ -41,6 +41,8 @@ import java.util.Set;
  * When complete, "todo" -> "fixme"
  */
 public class Solver {
+	
+
 	// Grid attributes
 	private int rows;
 	private int cols;
@@ -50,18 +52,21 @@ public class Solver {
 
 	// Solving attributes
 	private double temperature;
-	private double coolingRate;
+	private double coolingRate; 
+	private int violationChange;
+	private int curViolationCount;
+	private int bestViolationCount;
+	
 	// These two maps should always be an exact inverse of each other
 	// If one is updated the other is updated to match
 	private Map<Cell, Cell> treeTentMap; // tree to tent
 	private Map<Cell, Cell> tentTreeMap; // tent to tree
 	private Set<Cell> adjTentViols;
 	private Set<Cell> availableCells;
-	private int curViolationCount;
+	
 	private int[] curRowTents;
 	private int[] curColTents;
-	private int violationChange;
-
+	
 	// Solution attributes
 	private Map<Cell, Cell> solPairings; // tent to tree
 	private int solViolationCount;
@@ -97,7 +102,9 @@ public class Solver {
 	public int solve() {
 		return -1;
 	}
-
+	
+	
+	
 	public void anneal() {
 
 	}
@@ -156,6 +163,9 @@ public class Solver {
 				this.tentTreeMap.put(changeCell, pairTree);
 			}
 		}
+		
+		// FIXME:? May need to reset "fittness" (currentViolations)
+		
 	}
 
 	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
@@ -248,4 +258,38 @@ public class Solver {
 			System.out.println("failed to output to file, msg- " + e.getMessage());
 		}
 	}
+	
+	// ~ ~ ~ Utilites ~ ~ ~ //
+	
+	/**
+	 * Should be used as follows:
+	 * 	if ( acceptanceProb (~,~,~) > RandomNum ) 
+	 * FOR HOT STUFF
+	 * 
+	 * @param currentViolations
+	 * @param newViolations
+	 * @param temp
+	 * @return
+	 */
+	public static double acceptanceProb(int currentViolations, int newViolations, double temp) {
+		// Accept New Solution
+		if (newViolations < currentViolations) {
+			return 1.0;
+		}
+		
+		if (temp <= 0.0) {
+			return 0.0; // Stop, shit is too cold
+		}
+		
+		// Reject new solution and calculate acceptance probability.
+		// DO NOT ADJUST HERE, MAKE ADJUSTMENTS ELSEWHERE
+		return Math.exp( (currentViolations - newViolations) / temp);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// FIXME: Could need to be fixed depending on implementation
+		return super.equals(obj);
+	}
+	
 }
