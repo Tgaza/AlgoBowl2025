@@ -166,7 +166,7 @@ public class Verifier {
 	//counts the number of column violations
 	private int checkColumnViolations() {
 		int violations = 0;
-		for(int c = 0; c < rows; c++) {
+		for(int c = 0; c < columns; c++) {
 			if(desiredTentColumnCount[c] != tentColumnCount[c]) {
 				violations = violations + Math.abs(desiredTentColumnCount[c] - tentColumnCount[c]);
 			}
