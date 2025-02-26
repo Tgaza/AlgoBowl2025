@@ -79,10 +79,13 @@ public class Solver {
 	public static void main(String[] args) {
 		String inputFileName = "test8x8_1.txt";
 		String inputFileFolder = "testingInputs";
+		
 		String outputFileName = "test8x8_1_Solver_attempt_1.txt";
 		String outputFileFolder = "testingOutputFiles";
+		
 		String inputFile = inputFileFolder + "/" + inputFileName;
 		String outputFile = outputFileFolder + "/" + outputFileName;
+		
 		Solver solvee = new Solver();
 		solvee.readInput(inputFile);
 		solvee.generateInitialSol();
