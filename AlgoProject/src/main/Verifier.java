@@ -56,16 +56,17 @@ public class Verifier {
 	public static void main(String[] args) {
 		//this is some temporary bull shit just to get the program to run with files plugged in manually
 		//replace with args[0] and args[1] later
-		new Verifier("", "");
-		
+		new Verifier("officialInputs/input_group1001.txt", "officialOutputs/output_group1001_NullPntrException.txt");
 	}
 	
 	//Main code for running the verifier
 	public Verifier(String inputFile, String outputFile) {
 		super();
 		//for the time being the arguments are being left out intentionally
-		this.inputFile = "data/officialInputs/" + inputFile;
-		this.outputFile = "data/officialOutputs/" + outputFile;
+
+		this.inputFile = "data/" + inputFile;
+		this.outputFile = "data/" + outputFile;
+
 		readInput();
 		
 		//check to make sure the number of tents match
@@ -92,6 +93,7 @@ public class Verifier {
 		System.out.println(totalViolations);
 		
 		if(totalViolations != claimedViolations) {
+			System.out.print("incorrect Violation count - ");
 			exitProgram();
 		} else {
 			System.out.println("Valid Output File");
@@ -148,6 +150,7 @@ public class Verifier {
 	//checks the number of counted tents
 	private void checkTentCount() {
 		if(actualTentCount != claimedNumTentsPlaced) {
+			System.out.print("incorrect tent count - ");
 			exitProgram();
 		}
 	}
@@ -186,19 +189,25 @@ public class Verifier {
 					List<Cell> diagAdjList = currCell.getDiagAdjList();
 					List<Cell> cardinalAdjList = currCell.getCardinalAdjList();
 					
+					Boolean adjDetected = false;
+					
 					for(Cell cell : diagAdjList) {
 						if(cell.getSymbol() == '^') {
 							violations++;
+							adjDetected = true;
 							break;
 						}
 					}
 					
-					for(Cell cell : cardinalAdjList) {
-						if(cell.getSymbol() == '^') {
-							violations++;
-							break;
+					if(adjDetected == false) {
+						for(Cell cell : cardinalAdjList) {
+							if(cell.getSymbol() == '^') {
+								violations++;
+								break;
+							}
 						}
 					}
+					
 				}
 
 			}
@@ -216,6 +225,7 @@ public class Verifier {
 				if(cell.getSymbol() != '.') {
 					List<Cell> cellPairs = cell.getPairedCells();
 					if(cellPairs.size() > 1) {
+						System.out.print("cell paired with multiple cells - ");
 						exitProgram();
 					}
 					
@@ -286,6 +296,7 @@ public class Verifier {
 	//checks to make sure the correct number of arguments are provided from the output file
 	private void checkFormatting(int requirement, int elementCount) {
 		if(elementCount > requirement || elementCount < requirement) {
+			System.out.print("incorrect file formatting - ");
 			exitProgram();
 		}
 	}
@@ -293,15 +304,19 @@ public class Verifier {
 	//include out of bounds detection function here
 	private void outOfBoundsCheck(int x, int y) {
 		if(x < 0) {
+			System.out.print("tent or paired tree out of bounds - ");
 			exitProgram();
 		}
 		if(x > rows) {
+			System.out.print("tent or paired tree out of bounds - ");
 			exitProgram();
 		}
 		if(y < 0) {
+			System.out.print("tent or paired tree out of bounds - ");
 			exitProgram();
 		}
 		if(y > columns) {
+			System.out.print("tent or paired tree out of bounds - ");
 			exitProgram();
 		}
 	}
@@ -309,6 +324,7 @@ public class Verifier {
 	//include direction character validation
 	private void directionCharValidation(char c) {
 		if (c != 'X' && c != 'U' && c != 'R' && c != 'D' && c != 'L') {
+			System.out.print("invalid char present - ");
 		    exitProgram();
 		}
 
@@ -373,6 +389,7 @@ public class Verifier {
 			Cell currCell = grid.getCell(r, c);
 			
 			if(!tentSet.add(currCell)) {
+				System.out.print("duplicate tents - ");
 				exitProgram();
 			}
 			
@@ -391,6 +408,7 @@ public class Verifier {
 				
 				
 			} else {
+				System.out.print("tent placed ontop of another nonempty cell - ");
 				exitProgram();
 			}
 		}

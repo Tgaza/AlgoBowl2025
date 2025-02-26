@@ -10,6 +10,7 @@ package main;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,7 +77,21 @@ public class Solver {
 	private Random rand = new Random();
 
 	public static void main(String[] args) {
-
+		String inputFileName = "test8x8_1.txt";
+		String inputFileFolder = "testingInputs";
+		String outputFileName = "test8x8_1_Solver_attempt_1.txt";
+		String outputFileFolder = "testingOutputFiles";
+		String inputFile = inputFileFolder + "/" + inputFileName;
+		String outputFile = outputFileFolder + "/" + outputFileName;
+		Solver solvee = new Solver();
+		solvee.readInput(inputFile);
+		solvee.generateInitialSol();
+		solvee.calcInitialViolationCount();
+		solvee.printGrid();
+		solvee.printCurOutput();
+		solvee.curOutputToFile(outputFile);
+		
+		Verifier very = new Verifier(inputFile, outputFile);
 	}
 
 	public Solver() {
@@ -115,16 +130,29 @@ public class Solver {
 			ArrayList<Cell> adjCells = (ArrayList<Cell>) tree.getCardinalAdjList();
 			int cellToAdjust = this.rand.nextInt(adjCells.size());
 			Cell changeCell = adjCells.get(cellToAdjust);
-			if (changeCell.getSymbol() == '.') {
-				adjustCell(changeCell, tree);
-			} else {
-				
-			}
+			curViolationCount += calcViolationChange(changeCell, tree);
+			adjustCell(changeCell, tree);
 		}
+	}
+	
+	public void calcInitialViolationCount() {
+		int violationCount = 0;
+		for (int row = 0; row < this.rows; row++) {
+			violationCount += this.rowTents[row];
+		}
+		for (int col = 0; col < this.cols; col++) {
+			violationCount += this.colTents[col];
+		}
+		violationCount += this.gameGrid.getTrees().size();
+		this.curViolationCount = violationCount;
 	}
 
 	/*
 	 * Updates cell to go from empty to tent and vice versa, and updates adj tree to be pair and vice versa
+	 * NOTE: Assumes that caller will not pass in a combination that will cause an invalid output,
+	 * -such as: 
+	 * - providing a tree that is already paired with another tent
+	 * - providing a tree to changeCell or tent to pairTree
 	 * 
 	 * Case 1: Empty Cell and no tree to pair
 	 * 	Result: Place tent with no pairing
@@ -141,13 +169,13 @@ public class Solver {
 	*/
 	public void adjustCell(Cell changeCell, Cell pairTree) {
 		if (changeCell.getSymbol() == '.') {//Case 1
-			changeCell.setSymbol('^');
+			this.gameGrid.updateCell(changeCell, '^');
 			if (pairTree != null) {//Case 2
 				this.treeTentMap.put(pairTree, changeCell);
 				this.tentTreeMap.put(changeCell, pairTree);
 			}
 		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
-			changeCell.setSymbol('.');
+			this.gameGrid.updateCell(changeCell, '.');
 			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				this.treeTentMap.remove(pairTree, changeCell);
 				this.tentTreeMap.remove(changeCell, pairTree);
@@ -169,6 +197,12 @@ public class Solver {
 	}
 
 	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
+	 * NOTE: Assumes that caller will not pass in a combination that will cause an invalid output,
+	 * -such as: 
+	 * - providing a tree that is already paired with another tent
+	 * - providing a tree to changeCell or tent to pairTree
+	 * 
+	 * 
 	* Case 1: Empty Cell and no tree to pair
 	 * 	Result: Place tent with no pairing
 	 * Case 2: Empty Cell with tree to pair
@@ -188,8 +222,8 @@ public class Solver {
 		int col = changeCell.getCol();
 		//Check if the cell to change is an empty cell
 		if (changeCell.getSymbol() == '.') {//Case 1
-			violationChange += Math.abs(this.curRowTents[row] - (this.curRowTents[row] - 1));//update Violations from rowCount
-			violationChange += Math.abs(this.curColTents[col] - (this.curColTents[col] - 1));//update Violations from colCount
+			violationChange += (this.curRowTents[row] - (this.curRowTents[row] - 1));//update Violations from rowCount
+			violationChange += (this.curColTents[col] - (this.curColTents[col] - 1));//update Violations from colCount
 			if (pairTree != null) {//Check if there is a tree to be paired with then reduce violation, Case 2
 				violationChange--;
 			} else {//else increase violation, Case 1
@@ -200,8 +234,8 @@ public class Solver {
 			}
 			//else if the cell is a tree
 		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
-			violationChange += Math.abs(this.curRowTents[row] - (this.curRowTents[row] + 1));//update Violations from rowCount
-			violationChange += Math.abs(this.curColTents[col] - (this.curColTents[col] + 1));//update Violations from colCount
+			violationChange += (this.curRowTents[row] - (this.curRowTents[row] + 1));//update Violations from rowCount
+			violationChange += (this.curColTents[col] - (this.curColTents[col] + 1));//update Violations from colCount
 			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				violationChange++;
 			}else {//Case 3
@@ -213,9 +247,95 @@ public class Solver {
 		} //Cases 5 and 6 have no change to violation count
 		return violationChange;
 	}
+	
+	public void printGrid() {
+		System.out.println(this.rows + " " + this.cols);
+		System.out.println(this.curViolationCount);
+		System.out.println(this.gameGrid.getTents().size());
+		for (int row = 0; row < this.rows; row++) {
+			System.out.print(rowTents[row] + " ");
+		}
+		System.out.println();
+		for (int col = 0; col < this.cols; col++) {
+			System.out.print(colTents[col] + " ");
+		}
+		System.out.println();
+		// print out generated grid
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				String symbol = this.gameGrid.getCell(row, col).toString();
+				System.out.print(symbol);
+			}
+			System.out.println();
+		}
+	}
+	
+	public void printCurOutput() {
+		System.out.println(this.curViolationCount);
+		System.out.println(this.gameGrid.getTents().size());
+		for (Map.Entry<Cell, Cell> pair : tentTreeMap.entrySet()) {
+			int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
+			int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
+			String treeDir = "";
+			if(rowDiff == 1) {
+				treeDir = "U";
+			}else if(rowDiff == -1) {
+				treeDir = "D";
+			}else if(colDiff == 1) {
+				treeDir = "L";
+			}else if(colDiff == -1) {
+				treeDir = "R";
+			}
+			System.out.println((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir);
+		}
+	}
 
-	public void readInput(String fileName) {
-		try (Scanner sc = new Scanner(new File("data/testingOutputs/" + fileName))) {
+	public void curOutputToFile(String outputFile) {
+		try (FileWriter writer = new FileWriter("data/" + outputFile)) {
+			writer.write(this.curViolationCount + "\n");
+			writer.write(this.gameGrid.getTents().size() + "\n");
+			int linesToWrite = tentTreeMap.entrySet().size();
+			Map.Entry<Cell, Cell> finalPair = null;
+			for (Map.Entry<Cell, Cell> pair : tentTreeMap.entrySet()) {
+				if(linesToWrite == 1) {
+					finalPair = pair;
+					break;
+				}
+				int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
+				int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
+				String treeDir = "";
+				if(rowDiff == 1) {
+					treeDir = "U";
+				}else if(rowDiff == -1) {
+					treeDir = "D";
+				}else if(colDiff == 1) {
+					treeDir = "L";
+				}else if(colDiff == -1) {
+					treeDir = "R";
+				}
+				writer.write((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir + "\n");
+				linesToWrite--;
+			}
+			int rowDiff = finalPair.getKey().getRow()-finalPair.getValue().getRow();
+			int colDiff = finalPair.getKey().getCol()-finalPair.getValue().getCol();
+			String treeDir = "";
+			if(rowDiff == 1) {
+				treeDir = "U";
+			}else if(rowDiff == -1) {
+				treeDir = "D";
+			}else if(colDiff == 1) {
+				treeDir = "L";
+			}else if(colDiff == -1) {
+				treeDir = "R";
+			}
+			writer.write((finalPair.getKey().getRow()+1) + " " + (finalPair.getKey().getCol()+1) + " " + treeDir);
+		} catch (IOException e) {
+			System.out.println("failed to output to file, msg- " + e.getMessage());
+		}
+	}
+	
+	public void readInput(String inputFile) {
+		try (Scanner sc = new Scanner(new File("data/" + inputFile))) {
 			this.rows = Integer.parseInt(sc.next());
 			this.cols = Integer.parseInt(sc.next());
 
@@ -231,30 +351,60 @@ public class Solver {
 			for (int col = 0; col < this.cols; col++) {
 				this.colTents[col] = sc.nextInt();
 			}
-
+			sc.nextLine();
 			for (int row = 0; row < this.rows; row++) {
 				String line = sc.nextLine();
+				System.out.println(line);
 				for (int col = 0; col < this.cols; col++) {
 					this.gameGrid.updateCell(row, col, line.charAt(col));
-					//					if (this.gameGrid.getCell(row, col).getSymbol() == '.') {
-					//						this.availableCells.add(this.gameGrid.getCell(row, col));
-					//					}
 				}
 			}
 			System.out.println("Input read successfully");
-		} catch (Exception e) {
+			this.printGrid();
+		} catch (IOException e) {
 			System.out.println("failed to read from file, msg- " + e.getMessage());
 		}
 	}
 
-	public void outputToFile(String fileName) {
-		try (FileWriter writer = new FileWriter("data/generatedInputsUnverified/" + fileName)) {
-			writer.write(this.solViolationCount);
-			writer.write(this.solTentsPlaced);
+	public void outputToFile(String outputFile) {
+		try (FileWriter writer = new FileWriter("data/" + outputFile)) {
+			writer.write(this.solViolationCount + "\n");
+			writer.write(this.solTentsPlaced + "\n");
+			int linesToWrite = solPairings.entrySet().size();
+			Map.Entry<Cell, Cell> finalPair = null;
 			for (Map.Entry<Cell, Cell> pair : solPairings.entrySet()) {
-				writer.write(pair.getKey().getRow() + " " + pair.getKey().getCol());
+				if(linesToWrite == 1) {
+					finalPair = pair;
+					break;
+				}
+				int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
+				int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
+				String treeDir = "";
+				if(rowDiff == 1) {
+					treeDir = "U";
+				}else if(rowDiff == -1) {
+					treeDir = "D";
+				}else if(colDiff == 1) {
+					treeDir = "L";
+				}else if(colDiff == -1) {
+					treeDir = "R";
+				}
+				writer.write((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir + "\n");
 			}
-		} catch (Exception e) {
+			int rowDiff = finalPair.getKey().getRow()-finalPair.getValue().getRow();
+			int colDiff = finalPair.getKey().getCol()-finalPair.getValue().getCol();
+			String treeDir = "";
+			if(rowDiff == 1) {
+				treeDir = "U";
+			}else if(rowDiff == -1) {
+				treeDir = "D";
+			}else if(colDiff == 1) {
+				treeDir = "L";
+			}else if(colDiff == -1) {
+				treeDir = "R";
+			}
+			writer.write((finalPair.getKey().getRow()+1) + " " + (finalPair.getKey().getCol()+1) + " " + treeDir);
+		} catch (IOException e) {
 			System.out.println("failed to output to file, msg- " + e.getMessage());
 		}
 	}
