@@ -128,4 +128,14 @@ public class GameGrid {
 		return this.grid[row][col];
 	}
 
+	public int getRows() {
+		return rows;
+	}
+
+	public int getCols() {
+		return cols;
+	}
+	
+	
+
 }

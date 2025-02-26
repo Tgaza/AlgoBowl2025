@@ -53,11 +53,17 @@ public class Verifier {
 	
 	private int actualTentCount = 0;
 	
+	private int totalViolations = 0;
+	
 	public static void main(String[] args) {
 		//this is some temporary bull shit just to get the program to run with files plugged in manually
 		//replace with args[0] and args[1] later
 		new Verifier("", "");
 		
+	}
+	
+	public Verifier() {
+		super();
 	}
 	
 	//Main code for running the verifier
@@ -72,17 +78,10 @@ public class Verifier {
 		checkTentCount();
 		
 		//check how many violations there are per row and column
-		int rowViolations = checkRowViolations();
-		int columnViolations = checkColumnViolations();
 		
-		//check how many violations are caused by adjacent tents
-		int adjViolations = checkAdjViolations();
-		
-		//check how many violations there are in terms of pairing
-		int pairViolations = checkPairViolations();
 		
 		//Total number of violations made
-		int totalViolations = rowViolations + columnViolations + adjViolations + pairViolations;
+		totalViolations = sumViolations();
 		
 		//just for testing purposes
 //		System.out.println(rowViolations);
@@ -97,6 +96,25 @@ public class Verifier {
 			System.out.println("Valid Output File");
 		}
 		
+	}
+	
+	public int sumViolations() {
+		int rowViolations = checkRowViolations();
+		
+		int columnViolations = checkColumnViolations();
+		
+		//check how many violations are caused by adjacent tents
+		int adjViolations = checkAdjViolations();
+		
+		//check how many violations there are in terms of pairing
+		int pairViolations = checkPairViolations();
+		
+		System.out.println(rowViolations);
+		System.out.println(columnViolations);
+		System.out.println(adjViolations);
+		System.out.println(pairViolations);
+		
+		return rowViolations + columnViolations + adjViolations + pairViolations;
 	}
 	
 	//These functions are used for debugging purposes
@@ -166,7 +184,9 @@ public class Verifier {
 	//counts the number of column violations
 	private int checkColumnViolations() {
 		int violations = 0;
-		for(int c = 0; c < rows; c++) {
+		for(int c = 0; c < columns; c++) {
+			System.out.println("DesiredTentColCount: " + desiredTentColumnCount[c]);
+			System.out.println("TentColumnCount: " + tentColumnCount[c]);
 			if(desiredTentColumnCount[c] != tentColumnCount[c]) {
 				violations = violations + Math.abs(desiredTentColumnCount[c] - tentColumnCount[c]);
 			}
@@ -252,7 +272,7 @@ public class Verifier {
 	}
 	
 	//reads in the grid information of the input file and builds the grid
-	private void buildBaseGrid() {
+	public void buildBaseGrid() {
 		try {
 	        scanner = new Scanner(new File(inputFile)); // Corrected Scanner initialization
 	    } catch (FileNotFoundException e) {
@@ -434,6 +454,46 @@ public class Verifier {
 	public void readInput() {
 		buildBaseGrid();
 		buildGridWithTents();
+	}
+
+	public GameGrid getGrid() {
+		return grid;
+	}
+
+	public void setInputFile(String inputFile) {
+		this.inputFile = inputFile;
+	}
+
+	public void setOutputFile(String outputFile) {
+		this.outputFile = outputFile;
+	}
+
+	public int getTotalViolations() {
+		return totalViolations;
+	}
+
+	public void increaseTentRowCount(int index) {
+		tentRowCount[index]++;
+	}
+	
+	public void increaseTentColumnCount(int index) {
+		tentColumnCount[index]++;
+	}
+	
+	public void decreaseTentRowCount(int index) {
+		tentRowCount[index]--;
+	}
+	
+	public void decreaseTentColumnCount(int index) {
+		tentColumnCount[index]--;
+	}
+	
+	public void initializeTentRowCount() {
+		tentRowCount = new int[rows];
+	}
+	
+	public void initializeTentColumnCount() {
+		tentColumnCount = new int[columns];
 	}
 
 	
