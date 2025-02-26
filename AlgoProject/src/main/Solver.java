@@ -75,6 +75,7 @@ public class Solver {
 		solvee.readInput("test8x8_1.txt", "testingInputs");
 		solvee.generateInitialSol();
 		solvee.printGrid();
+		solvee.printCurOutput();
 	}
 
 	public Solver() {
@@ -111,6 +112,7 @@ public class Solver {
 			ArrayList<Cell> adjCells = (ArrayList<Cell>) tree.getCardinalAdjList();
 			int cellToAdjust = this.rand.nextInt(adjCells.size());
 			Cell changeCell = adjCells.get(cellToAdjust);
+			curViolationCount += calcViolationChange(changeCell, tree);
 			adjustCell(changeCell, tree);
 		}
 	}
@@ -187,8 +189,8 @@ public class Solver {
 		int col = changeCell.getCol();
 		//Check if the cell to change is an empty cell
 		if (changeCell.getSymbol() == '.') {//Case 1
-			violationChange += Math.abs(this.curRowTents[row] - (this.curRowTents[row] - 1));//update Violations from rowCount
-			violationChange += Math.abs(this.curColTents[col] - (this.curColTents[col] - 1));//update Violations from colCount
+			violationChange += (this.curRowTents[row] - (this.curRowTents[row] - 1));//update Violations from rowCount
+			violationChange += (this.curColTents[col] - (this.curColTents[col] - 1));//update Violations from colCount
 			if (pairTree != null) {//Check if there is a tree to be paired with then reduce violation, Case 2
 				violationChange--;
 			} else {//else increase violation, Case 1
@@ -199,8 +201,8 @@ public class Solver {
 			}
 			//else if the cell is a tree
 		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
-			violationChange += Math.abs(this.curRowTents[row] - (this.curRowTents[row] + 1));//update Violations from rowCount
-			violationChange += Math.abs(this.curColTents[col] - (this.curColTents[col] + 1));//update Violations from colCount
+			violationChange += (this.curRowTents[row] - (this.curRowTents[row] + 1));//update Violations from rowCount
+			violationChange += (this.curColTents[col] - (this.curColTents[col] + 1));//update Violations from colCount
 			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				violationChange++;
 			}else {//Case 3
@@ -215,6 +217,7 @@ public class Solver {
 	
 	public void printGrid() {
 		System.out.println(this.rows + " " + this.cols);
+		System.out.println(this.curViolationCount);
 		System.out.println(this.gameGrid.getTents().size());
 		for (int row = 0; row < this.rows; row++) {
 			System.out.print(rowTents[row] + " ");
@@ -231,6 +234,26 @@ public class Solver {
 				System.out.print(symbol);
 			}
 			System.out.println();
+		}
+	}
+	
+	public void printCurOutput() {
+		System.out.println(this.curViolationCount);
+		System.out.println(this.gameGrid.getTents().size());
+		for (Map.Entry<Cell, Cell> pair : tentTreeMap.entrySet()) {
+			int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
+			int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
+			String treeDir = "";
+			if(rowDiff == 1) {
+				treeDir = "U";
+			}else if(rowDiff == -1) {
+				treeDir = "D";
+			}else if(colDiff == 1) {
+				treeDir = "L";
+			}else if(colDiff == -1) {
+				treeDir = "R";
+			}
+			System.out.println(pair.getKey().getRow() + " " + pair.getKey().getCol() + " " + treeDir);
 		}
 	}
 
