@@ -55,10 +55,11 @@ public class Solver {
 	private Map<Cell, Cell> treeTentMap; // tree to tent
 	private Map<Cell, Cell> tentTreeMap; // tent to tree
 	private Set<Cell> adjTentViols;
-	private Set<Cell> av;
+	private Set<Cell> availableCells;
 	private int curViolationCount;
 	private int[] curRowTents;
 	private int[] curColTents;
+	private int violationChange;
 
 	// Solution attributes
 	private Map<Cell, Cell> solPairings; // tent to tree
@@ -109,7 +110,38 @@ public class Solver {
 		}
 	}
 	
-	public int calcViolationChange(Cell cell) {
+	//Updates cell to go from empty to tent and vice versa, 
+	// and updates adj tree to be pair and vice versa
+	public void adjustCell(Cell changeCell, Cell pairTree) {
+		if(changeCell.getSymbol() == '.') {
+			changeCell.setSymbol('^');
+			if(pairTree != null) {
+				this.treeTentMap.put(pairTree, changeCell);
+				this.tentTreeMap.put(changeCell, pairTree);
+			}
+		}else {
+			changeCell.setSymbol('.');
+			if(pairTree != null) {
+				this.treeTentMap.remove(pairTree, changeCell);
+				this.tentTreeMap.remove(changeCell, pairTree);
+			}
+		}
+	}
+	
+	//Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
+	public int calcViolationChange(Cell changeCell, Cell pairTree) {
+		int violationChange;
+		if(changeCell.getSymbol() == '.') {
+			
+			if(pairTree != null) {
+			}
+		}else {
+			changeCell.setSymbol('.');
+			if(pairTree != null) {
+				this.treeTentMap.remove(pairTree, changeCell);
+				this.tentTreeMap.remove(changeCell, pairTree);
+			}
+		}
 		return -1;
 	}
 	

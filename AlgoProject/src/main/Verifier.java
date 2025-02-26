@@ -64,8 +64,8 @@ public class Verifier {
 	public Verifier(String inputFile, String outputFile) {
 		super();
 		//for the time being the arguments are being left out intentionally
-		this.inputFile = "data/testingInputs/basicIn.txt";
-		this.outputFile = "data/testingOutputFiles/basicOut.txt";
+		this.inputFile = "data/officialInputs/input_group1001.txt";
+		this.outputFile = "data/officialOutputs/output_group1001_NullPntrException.txt";
 		readInput();
 		
 		//check to make sure the number of tents match
