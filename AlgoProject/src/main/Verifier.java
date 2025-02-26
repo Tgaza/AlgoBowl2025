@@ -186,19 +186,25 @@ public class Verifier {
 					List<Cell> diagAdjList = currCell.getDiagAdjList();
 					List<Cell> cardinalAdjList = currCell.getCardinalAdjList();
 					
+					Boolean adjDetected = false;
+					
 					for(Cell cell : diagAdjList) {
 						if(cell.getSymbol() == '^') {
 							violations++;
+							adjDetected = true;
 							break;
 						}
 					}
 					
-					for(Cell cell : cardinalAdjList) {
-						if(cell.getSymbol() == '^') {
-							violations++;
-							break;
+					if(adjDetected == false) {
+						for(Cell cell : cardinalAdjList) {
+							if(cell.getSymbol() == '^') {
+								violations++;
+								break;
+							}
 						}
 					}
+					
 				}
 
 			}
