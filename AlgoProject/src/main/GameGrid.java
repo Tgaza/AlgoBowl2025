@@ -89,6 +89,28 @@ public class GameGrid {
 		}
 		return targets;
 	}
+
+	public int checkAdjAliens(Cell origCell, boolean removing) {
+		int alienCount = 0;
+		if(removing) {
+			this.updateCell(origCell, '.');
+		}
+		for (Cell adjCell : origCell.getCardinalAdjList()) {
+			if (adjCell.isTent() && !this.isAdjTent(adjCell)) {
+				alienCount++;
+			}
+		}
+		for (Cell adjCell : origCell.getDiagAdjList()) {
+			if (adjCell.isTent() && !this.isAdjTent(adjCell)) {
+				alienCount++;
+			}
+		}
+		if(removing) {
+			this.updateCell(origCell, '^');
+		}
+		return alienCount;
+	}
+
 	//Checks for an adjTent
 	public boolean isAdjTent(Cell cell) {
 		boolean adjTent = false;
