@@ -122,14 +122,14 @@ public class Solver {
 	 * 	Result: Place tent with no pairing
 	 * Case 2: Empty Cell with tree to pair
 	 * 	Result: Place tent with paired tent
-	 * Case 3: tentCell with pairTree as it's current paired Tree
-	 * 	Result: remove tent and it's pairing
-	 * Case 4: tentCell with pairTree as a tree it is not paired with
-	 * 	Result: switch tent's pairing to new tree
-	 * Case 5: tentCell with no paired tree, and pairTree is not null
-	 * 	Result: switch tent's pairing to new tree
-	 * Case 6: tentCell with no paired tree, and pairTree is null
+	 * Case 3: tentCell with no paired tree, and pairTree is null
 	 * 	Result: remove tent
+	 * Case 4: tentCell with pairTree as it's current paired Tree
+	 * 	Result: remove tent and it's pairing
+	 * Case 5: tentCell with pairTree as a tree it is not paired with
+	 * 	Result: switch tent's pairing to new tree
+	 * Case 6: tentCell with no paired tree, and pairTree is not null
+	 * 	Result: switch tent's pairing to new tree
 	*/
 	public void adjustCell(Cell changeCell, Cell pairTree) {
 		if (changeCell.getSymbol() == '.') {//Case 1
@@ -138,57 +138,68 @@ public class Solver {
 				this.treeTentMap.put(pairTree, changeCell);
 				this.tentTreeMap.put(changeCell, pairTree);
 			}
-		} else if(this.tentTreeMap.containsKey(changeCell)){// Cases 3/4
-			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 3
-				changeCell.setSymbol('.');
+		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
+			changeCell.setSymbol('.');
+			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				this.treeTentMap.remove(pairTree, changeCell);
 				this.tentTreeMap.remove(changeCell, pairTree);
-			}else {//Case 4
+			}
+		} else {// Cases 5/6
+			if(this.tentTreeMap.containsKey(changeCell)){//Case 5
 				this.treeTentMap.remove(this.tentTreeMap.get(changeCell), changeCell);
 				this.tentTreeMap.remove(changeCell);
 				this.treeTentMap.put(pairTree, changeCell);
 				this.tentTreeMap.put(changeCell, pairTree);
-			}
-		} else {// Cases 6/7
-			if(pairTree != null){//Case 6
+			}else {// Case 6
 				this.treeTentMap.put(pairTree, changeCell);
 				this.tentTreeMap.put(changeCell, pairTree);
-			}else {// Case 7
-				changeCell.setSymbol('.');
 			}
 		}
 	}
 
-	//Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
+	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
+	* Case 1: Empty Cell and no tree to pair
+	 * 	Result: Place tent with no pairing
+	 * Case 2: Empty Cell with tree to pair
+	 * 	Result: Place tent with paired tent
+	 * Case 3: tentCell with no paired tree, and pairTree is null
+	 * 	Result: remove tent
+	 * Case 4: tentCell with pairTree as it's current paired Tree
+	 * 	Result: remove tent and it's pairing
+	 * Case 5: tentCell with pairTree as a tree it is not paired with
+	 * 	Result: switch tent's pairing to new tree
+	 * Case 6: tentCell with no paired tree, and pairTree is not null
+	 * 	Result: switch tent's pairing to new tree
+	*/
 	public int calcViolationChange(Cell changeCell, Cell pairTree) {
 		int violationChange = 0;
 		int row = changeCell.getRow();
 		int col = changeCell.getCol();
 		//Check if the cell to change is an empty cell
-		if (changeCell.getSymbol() == '.') {
+		if (changeCell.getSymbol() == '.') {//Case 1
 			violationChange += Math.abs(this.curRowTents[row] - (this.curRowTents[row] - 1));//update Violations from rowCount
 			violationChange += Math.abs(this.curColTents[col] - (this.curColTents[col] - 1));//update Violations from colCount
-			if (pairTree != null) {//Check if there is a tree to be paired with then reduce violation
+			if (pairTree != null) {//Check if there is a tree to be paired with then reduce violation, Case 2
 				violationChange--;
-			} else {//else increase violation
+			} else {//else increase violation, Case 1
 				violationChange++;
 			}
-			if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent
+			if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent, either case
 				violationChange++;
 			}
 			//else if the cell is a tree
-		} else {
+		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
 			violationChange += Math.abs(this.curRowTents[row] - (this.curRowTents[row] + 1));//update Violations from rowCount
 			violationChange += Math.abs(this.curColTents[col] - (this.curColTents[col] + 1));//update Violations from colCount
-			if (pairTree != null) {//Check if there is a tree to be paired with then increase violation
+			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				violationChange++;
-			} else {//else reduce violation
+			}else {//Case 3
 				violationChange--;
 			}
-			if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent
+			if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent, either case
 				violationChange--;
 			}
-		}
+		} //Cases 5 and 6 have no change to violation count
 		return violationChange;
 	}
 
