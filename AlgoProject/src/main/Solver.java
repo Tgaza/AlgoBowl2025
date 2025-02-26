@@ -71,11 +71,21 @@ public class Solver {
 	private Random rand = new Random();
 
 	public static void main(String[] args) {
+		String inputFileName = "test8x8_1.txt";
+		String inputFileFolder = "testingInputs";
+		String outputFileName = "test8x8_1_Solver_attempt_1.txt";
+		String outputFileFolder = "testingOutputFiles";
+		String inputFile = inputFileFolder + "/" + inputFileName;
+		String outputFile = outputFileFolder + "/" + outputFileName;
 		Solver solvee = new Solver();
-		solvee.readInput("test8x8_1.txt", "testingInputs");
+		solvee.readInput(inputFile);
 		solvee.generateInitialSol();
+		solvee.calcInitialViolationCount();
 		solvee.printGrid();
 		solvee.printCurOutput();
+		solvee.curOutputToFile(outputFile);
+		
+		Verifier very = new Verifier(inputFile, outputFile);
 	}
 
 	public Solver() {
@@ -115,6 +125,18 @@ public class Solver {
 			curViolationCount += calcViolationChange(changeCell, tree);
 			adjustCell(changeCell, tree);
 		}
+	}
+	
+	public void calcInitialViolationCount() {
+		int violationCount = 0;
+		for (int row = 0; row < this.rows; row++) {
+			violationCount += this.rowTents[row];
+		}
+		for (int col = 0; col < this.cols; col++) {
+			violationCount += this.colTents[col];
+		}
+		violationCount += this.gameGrid.getTrees().size();
+		this.curViolationCount = violationCount;
 	}
 
 	/*
@@ -253,12 +275,56 @@ public class Solver {
 			}else if(colDiff == -1) {
 				treeDir = "R";
 			}
-			System.out.println(pair.getKey().getRow() + " " + pair.getKey().getCol() + " " + treeDir);
+			System.out.println((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir);
 		}
 	}
 
-	public void readInput(String fileName, String dataFolder) {
-		try (Scanner sc = new Scanner(new File("data/" + dataFolder + "/" + fileName))) {
+	public void curOutputToFile(String outputFile) {
+		try (FileWriter writer = new FileWriter("data/" + outputFile)) {
+			writer.write(this.curViolationCount + "\n");
+			writer.write(this.gameGrid.getTents().size() + "\n");
+			int linesToWrite = tentTreeMap.entrySet().size();
+			Map.Entry<Cell, Cell> finalPair = null;
+			for (Map.Entry<Cell, Cell> pair : tentTreeMap.entrySet()) {
+				if(linesToWrite == 1) {
+					finalPair = pair;
+					break;
+				}
+				int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
+				int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
+				String treeDir = "";
+				if(rowDiff == 1) {
+					treeDir = "U";
+				}else if(rowDiff == -1) {
+					treeDir = "D";
+				}else if(colDiff == 1) {
+					treeDir = "L";
+				}else if(colDiff == -1) {
+					treeDir = "R";
+				}
+				writer.write((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir + "\n");
+				linesToWrite--;
+			}
+			int rowDiff = finalPair.getKey().getRow()-finalPair.getValue().getRow();
+			int colDiff = finalPair.getKey().getCol()-finalPair.getValue().getCol();
+			String treeDir = "";
+			if(rowDiff == 1) {
+				treeDir = "U";
+			}else if(rowDiff == -1) {
+				treeDir = "D";
+			}else if(colDiff == 1) {
+				treeDir = "L";
+			}else if(colDiff == -1) {
+				treeDir = "R";
+			}
+			writer.write((finalPair.getKey().getRow()+1) + " " + (finalPair.getKey().getCol()+1) + " " + treeDir);
+		} catch (IOException e) {
+			System.out.println("failed to output to file, msg- " + e.getMessage());
+		}
+	}
+	
+	public void readInput(String inputFile) {
+		try (Scanner sc = new Scanner(new File("data/" + inputFile))) {
 			this.rows = Integer.parseInt(sc.next());
 			this.cols = Integer.parseInt(sc.next());
 
@@ -289,11 +355,17 @@ public class Solver {
 		}
 	}
 
-	public void outputToFile(String fileName, String dataFolder) {
-		try (FileWriter writer = new FileWriter("data/" + dataFolder + "/" + fileName)) {
-			writer.write(this.solViolationCount);
-			writer.write(this.solTentsPlaced);
+	public void outputToFile(String outputFile) {
+		try (FileWriter writer = new FileWriter("data/" + outputFile)) {
+			writer.write(this.solViolationCount + "\n");
+			writer.write(this.solTentsPlaced + "\n");
+			int linesToWrite = solPairings.entrySet().size();
+			Map.Entry<Cell, Cell> finalPair = null;
 			for (Map.Entry<Cell, Cell> pair : solPairings.entrySet()) {
+				if(linesToWrite == 1) {
+					finalPair = pair;
+					break;
+				}
 				int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
 				int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
 				String treeDir = "";
@@ -306,8 +378,21 @@ public class Solver {
 				}else if(colDiff == -1) {
 					treeDir = "R";
 				}
-				writer.write(pair.getKey().getRow() + " " + pair.getKey().getCol() + " " + treeDir);
+				writer.write((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir + "\n");
 			}
+			int rowDiff = finalPair.getKey().getRow()-finalPair.getValue().getRow();
+			int colDiff = finalPair.getKey().getCol()-finalPair.getValue().getCol();
+			String treeDir = "";
+			if(rowDiff == 1) {
+				treeDir = "U";
+			}else if(rowDiff == -1) {
+				treeDir = "D";
+			}else if(colDiff == 1) {
+				treeDir = "L";
+			}else if(colDiff == -1) {
+				treeDir = "R";
+			}
+			writer.write((finalPair.getKey().getRow()+1) + " " + (finalPair.getKey().getCol()+1) + " " + treeDir);
 		} catch (IOException e) {
 			System.out.println("failed to output to file, msg- " + e.getMessage());
 		}
