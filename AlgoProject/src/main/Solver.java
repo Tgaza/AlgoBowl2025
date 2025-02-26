@@ -85,8 +85,8 @@ public class Solver {
 		String outputFile = outputFileFolder + "/" + outputFileName;
 		Solver solvee = new Solver();
 		solvee.readInput(inputFile);
-		solvee.generateInitialSol();
 		solvee.calcInitialViolationCount();
+		solvee.generateInitialSol();
 		solvee.printGrid();
 		solvee.printCurOutput();
 		solvee.curOutputToFile(outputFile);
@@ -130,7 +130,9 @@ public class Solver {
 			ArrayList<Cell> adjCells = (ArrayList<Cell>) tree.getCardinalAdjList();
 			int cellToAdjust = this.rand.nextInt(adjCells.size());
 			Cell changeCell = adjCells.get(cellToAdjust);
-			curViolationCount += calcViolationChange(changeCell, tree);
+			int violationChange = calcViolationChange(changeCell, tree);
+			this.curViolationCount += violationChange;
+			System.out.println(violationChange);
 			adjustCell(changeCell, tree);
 		}
 	}
@@ -170,12 +172,16 @@ public class Solver {
 	public void adjustCell(Cell changeCell, Cell pairTree) {
 		if (changeCell.getSymbol() == '.') {//Case 1
 			this.gameGrid.updateCell(changeCell, '^');
+			this.curRowTents[changeCell.getRow()]--;
+			this.curColTents[changeCell.getCol()]--;
 			if (pairTree != null) {//Case 2
 				this.treeTentMap.put(pairTree, changeCell);
 				this.tentTreeMap.put(changeCell, pairTree);
 			}
 		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
 			this.gameGrid.updateCell(changeCell, '.');
+			this.curRowTents[changeCell.getRow()]++;
+			this.curColTents[changeCell.getCol()]++;
 			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				this.treeTentMap.remove(pairTree, changeCell);
 				this.tentTreeMap.remove(changeCell, pairTree);
@@ -222,8 +228,8 @@ public class Solver {
 		int col = changeCell.getCol();
 		//Check if the cell to change is an empty cell
 		if (changeCell.getSymbol() == '.') {//Case 1
-			violationChange += (this.curRowTents[row] - (this.curRowTents[row] - 1));//update Violations from rowCount
-			violationChange += (this.curColTents[col] - (this.curColTents[col] - 1));//update Violations from colCount
+			violationChange += (Math.abs(this.curRowTents[row] - 1) - Math.abs(this.curRowTents[row]));//update Violations from rowCount
+			violationChange += (Math.abs(this.curColTents[col] - 1) - Math.abs(this.curColTents[col]));//update Violations from colCount
 			if (pairTree != null) {//Check if there is a tree to be paired with then reduce violation, Case 2
 				violationChange--;
 			} else {//else increase violation, Case 1
@@ -231,11 +237,12 @@ public class Solver {
 			}
 			if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent, either case
 				violationChange++;
+				violationChange += this.gameGrid.checkAdjAliens(changeCell, false);
 			}
 			//else if the cell is a tree
 		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
-			violationChange += (this.curRowTents[row] - (this.curRowTents[row] + 1));//update Violations from rowCount
-			violationChange += (this.curColTents[col] - (this.curColTents[col] + 1));//update Violations from colCount
+			violationChange += (Math.abs(this.curRowTents[row] + 1) - Math.abs(this.curRowTents[row]));//update Violations from rowCount
+			violationChange += (Math.abs(this.curColTents[col] + 1) - Math.abs(this.curColTents[col]));//update Violations from colCount
 			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				violationChange++;
 			}else {//Case 3
@@ -243,6 +250,7 @@ public class Solver {
 			}
 			if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent, either case
 				violationChange--;
+				violationChange -= this.gameGrid.checkAdjAliens(changeCell, true);
 			}
 		} //Cases 5 and 6 have no change to violation count
 		return violationChange;
@@ -347,9 +355,11 @@ public class Solver {
 
 			for (int row = 0; row < this.rows; row++) {
 				this.rowTents[row] = sc.nextInt();
+				this.curRowTents[row] = this.rowTents[row];
 			}
 			for (int col = 0; col < this.cols; col++) {
 				this.colTents[col] = sc.nextInt();
+				this.curColTents[col] = this.colTents[col];
 			}
 			sc.nextLine();
 			for (int row = 0; row < this.rows; row++) {
