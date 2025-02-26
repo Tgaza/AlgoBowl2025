@@ -107,16 +107,16 @@ public class Solver {
 			ArrayList<Cell> adjCells = (ArrayList<Cell>) tree.getCardinalAdjList();
 			int cellToAdjust = this.rand.nextInt(adjCells.size());
 			Cell changeCell = adjCells.get(cellToAdjust);
-			if (changeCell.getSymbol() == '.') {
-				adjustCell(changeCell, tree);
-			} else {
-				
-			}
+			adjustCell(changeCell, tree);
 		}
 	}
 
 	/*
 	 * Updates cell to go from empty to tent and vice versa, and updates adj tree to be pair and vice versa
+	 * NOTE: Assumes that caller will not pass in a combination that will cause an invalid output,
+	 * -such as: 
+	 * - providing a tree that is already paired with another tent
+	 * - providing a tree to changeCell or tent to pairTree
 	 * 
 	 * Case 1: Empty Cell and no tree to pair
 	 * 	Result: Place tent with no pairing
@@ -158,6 +158,12 @@ public class Solver {
 	}
 
 	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
+	 * NOTE: Assumes that caller will not pass in a combination that will cause an invalid output,
+	 * -such as: 
+	 * - providing a tree that is already paired with another tent
+	 * - providing a tree to changeCell or tent to pairTree
+	 * 
+	 * 
 	* Case 1: Empty Cell and no tree to pair
 	 * 	Result: Place tent with no pairing
 	 * Case 2: Empty Cell with tree to pair
