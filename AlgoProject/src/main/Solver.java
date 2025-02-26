@@ -10,6 +10,7 @@ package main;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,7 +71,10 @@ public class Solver {
 	private Random rand = new Random();
 
 	public static void main(String[] args) {
-
+		Solver solvee = new Solver();
+		solvee.readInput("test8x8_1.txt", "testingInputs");
+		solvee.generateInitialSol();
+		solvee.printGrid();
 	}
 
 	public Solver() {
@@ -133,13 +137,13 @@ public class Solver {
 	*/
 	public void adjustCell(Cell changeCell, Cell pairTree) {
 		if (changeCell.getSymbol() == '.') {//Case 1
-			changeCell.setSymbol('^');
+			this.gameGrid.updateCell(changeCell, '^');
 			if (pairTree != null) {//Case 2
 				this.treeTentMap.put(pairTree, changeCell);
 				this.tentTreeMap.put(changeCell, pairTree);
 			}
 		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
-			changeCell.setSymbol('.');
+			this.gameGrid.updateCell(changeCell, '.');
 			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
 				this.treeTentMap.remove(pairTree, changeCell);
 				this.tentTreeMap.remove(changeCell, pairTree);
@@ -208,9 +212,30 @@ public class Solver {
 		} //Cases 5 and 6 have no change to violation count
 		return violationChange;
 	}
+	
+	public void printGrid() {
+		System.out.println(this.rows + " " + this.cols);
+		System.out.println(this.gameGrid.getTents().size());
+		for (int row = 0; row < this.rows; row++) {
+			System.out.print(rowTents[row] + " ");
+		}
+		System.out.println();
+		for (int col = 0; col < this.cols; col++) {
+			System.out.print(colTents[col] + " ");
+		}
+		System.out.println();
+		// print out generated grid
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				String symbol = this.gameGrid.getCell(row, col).toString();
+				System.out.print(symbol);
+			}
+			System.out.println();
+		}
+	}
 
-	public void readInput(String fileName) {
-		try (Scanner sc = new Scanner(new File("data/testingOutputs/" + fileName))) {
+	public void readInput(String fileName, String dataFolder) {
+		try (Scanner sc = new Scanner(new File("data/" + dataFolder + "/" + fileName))) {
 			this.rows = Integer.parseInt(sc.next());
 			this.cols = Integer.parseInt(sc.next());
 
@@ -226,30 +251,41 @@ public class Solver {
 			for (int col = 0; col < this.cols; col++) {
 				this.colTents[col] = sc.nextInt();
 			}
-
+			sc.nextLine();
 			for (int row = 0; row < this.rows; row++) {
 				String line = sc.nextLine();
+				System.out.println(line);
 				for (int col = 0; col < this.cols; col++) {
 					this.gameGrid.updateCell(row, col, line.charAt(col));
-					//					if (this.gameGrid.getCell(row, col).getSymbol() == '.') {
-					//						this.availableCells.add(this.gameGrid.getCell(row, col));
-					//					}
 				}
 			}
 			System.out.println("Input read successfully");
-		} catch (Exception e) {
+			this.printGrid();
+		} catch (IOException e) {
 			System.out.println("failed to read from file, msg- " + e.getMessage());
 		}
 	}
 
-	public void outputToFile(String fileName) {
-		try (FileWriter writer = new FileWriter("data/generatedInputsUnverified/" + fileName)) {
+	public void outputToFile(String fileName, String dataFolder) {
+		try (FileWriter writer = new FileWriter("data/" + dataFolder + "/" + fileName)) {
 			writer.write(this.solViolationCount);
 			writer.write(this.solTentsPlaced);
 			for (Map.Entry<Cell, Cell> pair : solPairings.entrySet()) {
-				writer.write(pair.getKey().getRow() + " " + pair.getKey().getCol());
+				int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
+				int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
+				String treeDir = "";
+				if(rowDiff == 1) {
+					treeDir = "U";
+				}else if(rowDiff == -1) {
+					treeDir = "D";
+				}else if(colDiff == 1) {
+					treeDir = "L";
+				}else if(colDiff == -1) {
+					treeDir = "R";
+				}
+				writer.write(pair.getKey().getRow() + " " + pair.getKey().getCol() + " " + treeDir);
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			System.out.println("failed to output to file, msg- " + e.getMessage());
 		}
 	}
