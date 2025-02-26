@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * 2D Game Board.<br>
  * 
@@ -70,7 +69,7 @@ public class GameGrid {
 		List<Cell> targets = new ArrayList<>();
 		for (Cell cardinalCell : tree.getCardinalAdjList()) {
 			validCell = true;
-			if (!cardinalCell.isTent()){
+			if (!cardinalCell.isTent()) {
 				for (Cell adjCell : cardinalCell.getCardinalAdjList()) {
 					if (adjCell.isTent()) {
 						validCell = false;
@@ -89,6 +88,23 @@ public class GameGrid {
 			}
 		}
 		return targets;
+	}
+	//Checks for an adjTent
+	public boolean isAdjTent(Cell cell) {
+		boolean adjTent = false;
+		for (Cell adjCell : cell.getCardinalAdjList()) {
+			if (adjCell.isTent()) {
+				adjTent = true;
+				break;
+			}
+		}
+		for (Cell adjCell : cell.getDiagAdjList()) {
+			if (adjCell.isTent()) {
+				adjTent = true;
+				break;
+			}
+		}
+		return adjTent;
 	}
 
 	public void updateCell(Cell cell, char symbol) {
@@ -115,7 +131,7 @@ public class GameGrid {
 		}
 		cell.setSymbol(symbol);
 	}
-	
+
 	//overload of update cell to allow row and col input
 	public void updateCell(int row, int col, char symbol) {
 		Cell cell = this.grid[row][col];
