@@ -356,40 +356,17 @@ public class Solver {
 				}
 			}
 		}
-//		else if ( changeCell.getSymbol() == '.')
-//		
-//		if (changeCell.getSymbol() == '.') {//Case 1
-//			this.gameGrid.updateCell(changeCell, '^');
-//			this.curRowTents[changeCell.getRow()]--;
-//			this.curColTents[changeCell.getCol()]--;
-//			if (pairTree != null) {//Case 2
-//				this.treeTentMap.put(pairTree, changeCell);
-//				this.tentTreeMap.put(changeCell, pairTree);
-//			}
-//		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
-//			this.gameGrid.updateCell(changeCell, '.');
-//			this.curRowTents[changeCell.getRow()]++;
-//			this.curColTents[changeCell.getCol()]++;
-//			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
-//				this.treeTentMap.remove(pairTree, changeCell);
-//				this.tentTreeMap.remove(changeCell, pairTree);
-//			}
-//		} else {// Cases 5/6
-//			if(this.tentTreeMap.containsKey(changeCell)){//Case 5
-//				this.treeTentMap.remove(this.tentTreeMap.get(changeCell), changeCell);
-//				this.tentTreeMap.remove(changeCell);
-//				this.treeTentMap.put(pairTree, changeCell);
-//				this.tentTreeMap.put(changeCell, pairTree);
-//			}else {// Case 6
-//				this.treeTentMap.put(pairTree, changeCell);
-//				this.tentTreeMap.put(changeCell, pairTree);
-//			}
-//		}
 				
 	}
 	
 	//When done running, pairing in the maps should no longer exist, neither 
 	public void decouplePairings(Cell tent, Cell tree) {
+		if(this.tentTreeMap.containsKey(tent)) {
+			this.treeTentMap.remove(this.tentTreeMap.get(tent));
+		}
+		if(this.treeTentMap.containsKey(tree)) {
+			this.tentTreeMap.remove(this.treeTentMap.get(tree));
+		}
 		this.tentTreeMap.remove(tent);
 		this.treeTentMap.remove(tree);
 	}
