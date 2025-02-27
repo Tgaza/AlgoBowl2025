@@ -105,7 +105,7 @@ public class Solver {
 		//			
 		//		}
 		//	
-		boolean runOfficials = false;
+		boolean runOfficials = true;
 		if (runOfficials) {
 			boolean continueRunning = true;
 			HashSet<Integer> improvedFiles = new HashSet<Integer>();
@@ -125,7 +125,7 @@ public class Solver {
 					String inputFileName = "input_group" + inputGroupNum + ".txt";
 					String inputFileFolder = "officialInputs";
 					String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-					String outputFileFolder = "officialOutputs";
+					String outputFileFolder = "testingOutputFiles";
 					String inputFile = inputFileFolder + "/" + inputFileName;
 					String outputFile = outputFileFolder + "/" + outputFileName;
 
@@ -133,10 +133,8 @@ public class Solver {
 
 					solvee.readInput(inputFile);
 					solvee.calcInitialViolationCount();
-					//					solvee.generateInitialSol();
-					//					solvee.solve(inputFile);
-					solvee.generateInitialSolFull();
-					solvee.solveFull(inputFile);
+					solvee.generateInitialSol();
+					solvee.solveWithIssues(inputFile, outputFile);
 
 					int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
 					if (solvee.getSolViolationCount() < previousViolationCount) {
@@ -150,15 +148,15 @@ public class Solver {
 
 					Verifier finalVerify = new Verifier(inputFile, outputFile);
 				}
-				if (filesImproved <= 5) {
-					continueRunning = false;
-				}
+				//				if (filesImproved <= 5) {
+				continueRunning = false;
+				//				}
 			}
 			for (int file : improvedFiles) {
 				System.out.println("Improved File - " + file);
 			}
 		} else {
-			int inputGroupNum = 963;
+			int inputGroupNum = 964;
 			String inputFileName = "input_group" + inputGroupNum + ".txt";
 			String inputFileFolder = "officialInputs";
 			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
@@ -170,10 +168,8 @@ public class Solver {
 
 			solvee.readInput(inputFile);
 			solvee.calcInitialViolationCount();
-			//					solvee.generateInitialSol();
-			//					solvee.solve(inputFile);
-			solvee.generateInitialSolFull();
-			solvee.solveFull(inputFile);
+			solvee.generateInitialSol();
+			solvee.solve(inputFile);
 
 			int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
 			if (solvee.getSolViolationCount() < previousViolationCount) {
@@ -194,8 +190,8 @@ public class Solver {
 		this.rowTents = null;
 		this.colTents = null;
 		this.gameGrid = null;
-		this.temperature = 100;
-		this.coolingRate = 0.0000001;
+		this.temperature = 10;
+		this.coolingRate = 0.001;
 		this.treeTentMap = new HashMap<Cell, Cell>();
 		this.tentTreeMap = new HashMap<Cell, Cell>();
 		this.availableCells = new ArrayList<Cell>();
@@ -210,29 +206,6 @@ public class Solver {
 	}
 
 	//solve methods
-
-	public void solveFull(String inputFile) {
-		this.availableCells.clear();
-		for (int row = 0; row < this.rows; row++) {
-			for (int col = 0; col < this.cols; col++) {
-				this.availableCells.add(this.gameGrid.getCell(row, col));
-			}
-		}
-		this.availableCells.removeAll(this.gameGrid.getTrees());
-		this.solViolationCount = this.curViolationCount;
-		this.solTentsPlaced = this.gameGrid.getTents().size();
-		this.updateSolutionPairings();
-		while (this.temperature > 0) {
-			annealFull();
-			if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
-				this.solViolationCount = this.curViolationCount;
-				this.solTentsPlaced = this.gameGrid.getTents().size();
-				this.updateSolutionPairings();
-			}
-			this.temperature -= this.coolingRate;
-		}
-
-	}
 
 	public void solve(String inputFile) {
 		double initialTemp = this.temperature;
@@ -280,31 +253,33 @@ public class Solver {
 
 	public void solveWithIssues(String inputFile, String outputFile) {
 		double initialTemp = this.temperature;
-		solViolationCount = curViolationCount;
-		solTentsPlaced = this.gameGrid.getTents().size();
+		this.solViolationCount = this.curViolationCount;
+		this.solTentsPlaced = this.gameGrid.getTents().size();
 		this.updateSolutionPairings();
 		this.updateCurPairings();
 		while (this.temperature > 0) {
 			annealTrees();
-			if (curViolationCount < solViolationCount || solViolationCount == -1) {
-				solViolationCount = curViolationCount;
-				solTentsPlaced = this.gameGrid.getTents().size();
+			if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
+				this.solViolationCount = this.curViolationCount;
+				this.solTentsPlaced = this.gameGrid.getTents().size();
 				this.updateSolutionPairings();
 			}
-			//			this.updateCurPairings();
-			//			this.curOutputToFile(outputFile);
-			//			this.printCurOutput();
-			//			System.out.println();
-			//			Verifier curVerify = new Verifier(inputFile, outputFile);
+//			this.updateCurPairings();
+//			this.curOutputToFile(outputFile);
+//			this.printCurOutput();
+//			System.out.println();
+//			Verifier curVerify = new Verifier(inputFile, outputFile);
 			this.temperature -= this.coolingRate;
 		}
-		if (curViolationCount < solViolationCount || solViolationCount == -1) {
-			solViolationCount = curViolationCount;
-			solTentsPlaced = this.gameGrid.getTents().size();
+		if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
+			this.solViolationCount = this.curViolationCount;
+			this.solTentsPlaced = this.gameGrid.getTents().size();
 			this.updateSolutionPairings();
 		}
 		System.out.println("attempting to reload current solution");
+		this.printGrid();
 		this.reloadSolution(inputFile);
+		this.printGrid();
 		ArrayList<Cell> availableCells2 = new ArrayList<Cell>();
 		for (int row = 0; row < this.rows; row++) {
 			for (int col = 0; col < this.cols; col++) {
@@ -318,9 +293,9 @@ public class Solver {
 		this.temperature = initialTemp;
 		while (this.temperature > 0) {
 			annealRowsCols();
-			if (curViolationCount < solViolationCount || solViolationCount == -1) {
-				solViolationCount = curViolationCount;
-				solTentsPlaced = this.gameGrid.getTents().size();
+			if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
+				this.solViolationCount = this.curViolationCount;
+				this.solTentsPlaced = this.gameGrid.getTents().size();
 				this.updateSolutionPairings();
 			}
 			this.updateCurPairings();
@@ -333,49 +308,6 @@ public class Solver {
 	}
 
 	//anneal methods
-
-	public void annealFull() {
-		int totalValidCells = this.availableCells.size();
-		Cell chosenCell = this.availableCells.get(this.rand.nextInt(0, totalValidCells));
-		ArrayList<Cell> availablePairings = chosenCell.getTreeAdjList();
-		int totalAvailablePairings = availablePairings.size();
-
-		Cell chosenPairTree = null;
-		if (totalAvailablePairings != 0) {
-			int chosenPairDecision = this.rand.nextInt(0, totalAvailablePairings);
-			chosenPairTree = availablePairings.get(chosenPairDecision);
-		}
-		/*if chosenPairTree is a tree, then do one of the cases below
-		 * Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing
-		 * 	Result: pair the two together
-		 * Case 2: ChosenCell is empty, and ChosenPairTree has no pairing
-		 * 	Result: place tent and pair with tree
-		 * Case 3: ChosenCell is a tent paired with ChosenPairTree
-		 * 	Result: remove tent and unpair
-		 * Case 4: ChosenCell is a tent with a pairing, and ChosenPairTree has no pairing
-		 * 	Result: decouple chosenCell's pairing and replace with ChosenPairTree
-		 * Case 5: ChosenCell is a tent with no pairing, and ChosenPairTree has a pairing
-		 * 	Result: decouple paired tree's pairing and pair tent with pairtree
-		 * Case 6: ChosenCell is empty, and ChosenPairTree has a pairing
-		 * 	Result: decouple paired tree's pairing and pair tent with pairtree
-		 * Case 7: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other
-		 * 	Result: decouple both pairings and pair tent to tree
-		 * 
-		 *else, chosenPairTree is a non-tree so do one of the cases below
-		 * Case 8: ChosenCell is empty
-		 * 	Result: place tent with no pairing
-		 * Case 9: ChosenCell is a tent with no pairing
-		 * 	Result: remove tent
-		 * Case 10: ChosenCell is a tent with a pairing
-		 * 	Result: currently remove tent and it's pairing
-		 * */
-//		this.printGrid(chosenCell);
-		int violationChange = calcViolationChangeTrees(chosenCell, chosenPairTree);
-		if (this.rand.nextDouble() < this.acceptanceProbWeighted(violationChange)) {
-			this.curViolationCount += violationChange;
-			this.adjustCellTrees(chosenCell, chosenPairTree);
-		}
-	}
 
 	public void annealTrees() {
 		int totalValidCells = this.availableCells.size();
@@ -452,49 +384,6 @@ public class Solver {
 			this.availableCells.addAll(adjCells);
 		}
 	}
-	
-
-	public void generateInitialSolEmpty() {
-		for (int row = 0; row < this.rows; row++) {
-			for (int col = 0; col < this.cols; col++) {
-				this.availableCells.add(this.gameGrid.getCell(row, col));
-			}
-		}
-		this.availableCells.removeAll(this.gameGrid.getTrees());
-	}
-
-	public void generateInitialSolFull() {
-		for (Cell tree : this.gameGrid.getTrees()) {
-			tree.trimTrees();
-			ArrayList<Cell> adjCells = (ArrayList<Cell>) tree.getCardinalAdjList();
-			if (adjCells.size() == 0) {
-				continue;
-			}
-			int cellToAdjust = this.rand.nextInt(adjCells.size());
-			Cell changeCell = adjCells.get(cellToAdjust);
-			int violationChange = calcViolationChangeTrees(changeCell, tree);
-			this.curViolationCount += violationChange;
-			adjustCellTrees(changeCell, tree);
-		}
-
-		for (int row = 0; row < this.rows; row++) {
-			for (int col = 0; col < this.cols; col++) {
-				this.availableCells.add(this.gameGrid.getCell(row, col));
-				this.gameGrid.getCell(row, col).updateTreeAdjList();
-			}
-		}
-		this.availableCells.removeAll(this.gameGrid.getTrees());
-		this.availableCells.removeAll(this.gameGrid.getTents());
-		for (int row = 0; row < this.rows; row++) {
-			for (int col = 0; col < this.cols; col++) {
-				if (this.rand.nextDouble() < 0.4) {
-					Cell cell = this.gameGrid.getCell(row, col);
-					this.curViolationCount += calcViolationChangeRowsCols(cell);
-					this.adjustCellRowsCols(cell);
-				}
-			}
-		}
-	}
 
 	//adjust cells methods
 
@@ -527,16 +416,12 @@ public class Solver {
 	 */
 	public void adjustCellTrees(Cell changeCell, Cell pairTree) {
 		// Case 8 9 10 // Chnage Cell is Not a Tree
-		if ((pairTree == null) || (!pairTree.isTree())) {
+		if ((pairTree != null) && (!pairTree.isTree())) {
 			// Case 8: Chosen Cell is empty -> Put Tent
 			if (changeCell.getSymbol() == '.') {
 				this.gameGrid.updateCell(changeCell, '^');
 				this.curRowTents[changeCell.getRow()]--;
 				this.curColTents[changeCell.getCol()]--;
-			} else if (pairTree == null) {
-				this.gameGrid.updateCell(changeCell, '.');
-				this.curRowTents[changeCell.getRow()]++;
-				this.curColTents[changeCell.getCol()]++;
 			} else if (changeCell.getSymbol() == '^') { // We must be a tent
 				// Case 9,10
 				decouplePairings(changeCell, tentTreeMap.get(changeCell));
@@ -798,7 +683,7 @@ public class Solver {
 		try (FileWriter writer = new FileWriter("data/" + outputFile)) {
 			writer.write(this.solViolationCount + "\n");
 			writer.write(this.solTentsPlaced + "\n");
-			int linesToWrite = solPairings.length;
+			int linesToWrite = this.solPairings.length;
 			for (int lineNum = 0; lineNum < linesToWrite - 1; lineNum++) {
 				writer.write(this.solPairings[lineNum]);
 			}
@@ -862,7 +747,7 @@ public class Solver {
 
 		// calculate acceptance probability
 		// DO NOT ADJUST HERE, MAKE ADJUSTMENTS ELSEWHERE
-		return Math.exp(violationChange / this.temperature);
+		return Math.exp(-violationChange / this.temperature);
 	}
 
 	public double acceptanceProbWeighted(int violationChange) {
@@ -1020,6 +905,7 @@ public class Solver {
 			this.colTents = new int[this.cols];
 			this.curRowTents = new int[this.rows];
 			this.curColTents = new int[this.cols];
+			this.gameGrid = new GameGrid(this.rows, this.cols);
 
 			for (int row = 0; row < this.rows; row++) {
 				this.rowTents[row] = sc.nextInt();
@@ -1058,7 +944,7 @@ public class Solver {
 					curColTents[col]--;
 
 					if (direction == 'X') {
-						return;
+						continue;
 					} else {
 						int treeR = currCell.getRow();
 						int treeC = currCell.getCol();
