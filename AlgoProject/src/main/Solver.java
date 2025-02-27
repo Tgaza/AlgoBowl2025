@@ -74,23 +74,58 @@ public class Solver {
 	private Random rand = new Random();
 
 	public static void main(String[] args) {
-		int inputGroupNum = 1001;
-		String inputFileName = "input_group" + 1001 + ".txt";
-		String inputFileFolder = "officialInputs";
-		String outputFileName = "output_group" + 1001 + "_attempt_1.txt";
-		String outputFileFolder = "testingOutputFiles";
-		String inputFile = inputFileFolder + "/" + inputFileName;
-		String outputFile = outputFileFolder + "/" + outputFileName;
-		Solver solvee = new Solver();
-		solvee.readInput(inputFile);
-		solvee.calcInitialViolationCount();
-		solvee.generateInitialSol();
-		//solvee.printGrid();
-		solvee.solve();
-		solvee.outputToFile(outputFile);
 
-		Verifier very = new Verifier(inputFile, outputFile);
-	}
+//		String inputFileFolder = "AlgoBowl/testingInputs";
+//		String outputFileFolder = "AlgoBowl/testingOutputFiles";
+		
+		
+		
+//	
+//		for (int i = 963; i < 1025; i++) {
+//			
+//			try {
+//				String inputFileName = "input_group" + i + ".txt";
+//				String outputFileName = inputFileFolder.replace(".txt", "_Solved.txt");
+//
+//				String inputFile = inputFileFolder + "/" + inputFileName;
+//				String outputFile = outputFileFolder + "/" + outputFileName;
+//
+//				//Solver solvee = new Solver();
+//				//solvee.readInput(inputFile);
+//				//solvee.calcInitialViolationCount();
+//				//solvee.generateInitialSol();
+//				//solvee.printGrid();
+//				//solvee.curOutputToFile(outputFile);
+//				//				
+//				//Verifier very = new Verifier(inputFile, outputFile);
+//
+//				System.out.println("Processed File: " + inputFile + " -> " + outputFile);
+//			} catch (Exception e) {
+//				System.out.println("Skipped File");
+//			}
+//			
+//		}
+//	
+			
+			int inputGroupNum = 1001;
+			String inputFileName = "input_group" + 1001 + ".txt";
+			String inputFileFolder = "officialInputs";
+			String outputFileName = "output_group" + 1001 + "_attempt_1.txt";
+			String outputFileFolder = "testingOutputFiles";
+			String inputFile = inputFileFolder + "/" + inputFileName;
+			String outputFile = outputFileFolder + "/" + outputFileName;
+			
+			Solver solvee = new Solver();
+			
+			solvee.readInput(inputFile);
+			solvee.calcInitialViolationCount();
+			solvee.generateInitialSol();
+			//solvee.printGrid();
+			solvee.solve();
+			solvee.outputToFile(outputFile);
+			
+			Verifier very = new Verifier(inputFile, outputFile);
+		}
 
 	public Solver() {
 		this.rows = -1;
@@ -228,6 +263,7 @@ public class Solver {
 	/*
 	 * Updates cell to go from empty to tent and vice versa, and updates adj tree to be pair and vice versa
 	 * 
+<<<<<<< HEAD
 	 *if chosenPairTree is a tree, then do one of the cases below
 	 * Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing
 	 * 	Result: pair the two together
@@ -243,6 +279,24 @@ public class Solver {
 	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
 	 * Case 7: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other
 	 * 	Result: decouple both pairings and pair tent to tree
+=======
+	 * Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing
+	 * 	Result: pair the two together
+	 * Case 2: ChosenCell is a tent with a pairing, and ChosenPairTree has no pairing
+	 * 	Result: remove original pairing of ChosenCell and replace with a pairing with ChosenPairTree
+	 * Case 4: ChosenCell is a tent paired with ChosenPairTree
+	 * 	Result: remove tent and unpair
+	 * 
+	 * 
+	 * Case 3: ChosenCell is a tent with no pairing, and ChosenPairTree has a pairing
+	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
+	 * Case 5: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other
+	 * 	Result: decouple both pairings and pair tent to tree
+	 * Case 6: ChosenCell is empty, and ChosenPairTree has no pairing
+	 * 	Result: place tent and pair with tree
+	 * Case 7: ChosenCell is empty, and ChosenPairTree has a pairing
+	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
+	 * 
 	 * 
 	 *else, chosenPairTree is a non-tree so do one of the cases below
 	 * Case 8: ChosenCell is empty
@@ -251,43 +305,93 @@ public class Solver {
 	 * 	Result: remove tent
 	 * Case 10: ChosenCell is a tent with a pairing
 	 * 	Result: currently remove tent and it's pairing
-	 * */
+	 */
 	public void adjustCell(Cell changeCell, Cell pairTree) {
-		if (changeCell.getSymbol() == '.') {//Case 1
-			this.gameGrid.updateCell(changeCell, '^');
-			this.curRowTents[changeCell.getRow()]--;
-			this.curColTents[changeCell.getCol()]--;
-			if (pairTree != null) {//Case 2
-				this.treeTentMap.put(pairTree, changeCell);
-				this.tentTreeMap.put(changeCell, pairTree);
+		// Case 8 9 10 // Chnage Cell is Not a Tree
+		if ( (pairTree != null) && (!pairTree.isTree()) ) {
+			// Case 8: Chosen Cell is empty -> Put Tent
+			if (changeCell.getSymbol() == '.') {
+				this.gameGrid.updateCell(changeCell, '^');
 			}
-		} else if (this.tentTreeMap.get(changeCell) == pairTree || pairTree == null) {// Cases 3
-			this.gameGrid.updateCell(changeCell, '.');
-			this.curRowTents[changeCell.getRow()]++;
-			this.curColTents[changeCell.getCol()]++;
-			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
-				this.treeTentMap.remove(pairTree, changeCell);
-				this.tentTreeMap.remove(changeCell, pairTree);
+			else if (changeCell.getSymbol() == '^'){ // We must be a tent
+				 // Case 9,10
+				decouplePairings(changeCell, tentTreeMap.get(changeCell));
+				this.gameGrid.updateCell(changeCell, '.');
 			}
-		} else {// Cases 5/6
-			if (this.tentTreeMap.containsKey(changeCell)) {//Case 5
-				this.treeTentMap.remove(this.tentTreeMap.get(changeCell), changeCell);
-				this.tentTreeMap.remove(changeCell);
-				this.treeTentMap.put(pairTree, changeCell);
-				this.tentTreeMap.put(changeCell, pairTree);
-			} else {// Case 6
-				this.treeTentMap.put(pairTree, changeCell);
-				this.tentTreeMap.put(changeCell, pairTree);
+			return;
+		}
+		// Case 1 and 3 // Tent no Tree pairs
+		if ( changeCell.getSymbol() == '^'){
+			if(!tentTreeMap.containsKey(changeCell)) {
+				if (pairTree != null) { // Gotta check to make sure that this jaunt aint null yeerd 
+					// Case 3,1 //
+					if(treeTentMap.containsKey(pairTree)) { // FIXME: HEY I FUCKED THIS BIGTIME
+						decouplePairings(changeCell, tentTreeMap.get(changeCell));
+						Cell oldTent = treeTentMap.get(pairTree);
+						tentTreeMap.remove(oldTent);
+						this.gameGrid.updateCell(oldTent, '.');
+					}
+					this.treeTentMap.put(pairTree, changeCell);
+					this.tentTreeMap.put(changeCell, pairTree);
+				}
+			}
+			else {
+				Cell oldPairTree = tentTreeMap.get(changeCell);
+				
+				if(pairTree == oldPairTree) { // Case 4
+					decouplePairings(pairTree, oldPairTree);
+					this.gameGrid.updateCell(changeCell, '.');
+				}
+				
+				else { // Case 2, 5
+					decouplePairings(pairTree, oldPairTree);
+					if (pairTree != null) {
+						if (treeTentMap.containsKey(pairTree)) {
+							decouplePairings(pairTree, null); // FIXME: HEY I FUCKED THIS TOO
+							this.gameGrid.updateCell(changeCell, '.');
+						}
+					}	
+					this.treeTentMap.put(pairTree, changeCell);
+					this.tentTreeMap.put(changeCell, pairTree);
+				}
 			}
 		}
-
-		// FIXME:? May need to reset "fittness" (currentViolations)
-
+//		else if ( changeCell.getSymbol() == '.')
+//		
+//		if (changeCell.getSymbol() == '.') {//Case 1
+//			this.gameGrid.updateCell(changeCell, '^');
+//			this.curRowTents[changeCell.getRow()]--;
+//			this.curColTents[changeCell.getCol()]--;
+//			if (pairTree != null) {//Case 2
+//				this.treeTentMap.put(pairTree, changeCell);
+//				this.tentTreeMap.put(changeCell, pairTree);
+//			}
+//		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
+//			this.gameGrid.updateCell(changeCell, '.');
+//			this.curRowTents[changeCell.getRow()]++;
+//			this.curColTents[changeCell.getCol()]++;
+//			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
+//				this.treeTentMap.remove(pairTree, changeCell);
+//				this.tentTreeMap.remove(changeCell, pairTree);
+//			}
+//		} else {// Cases 5/6
+//			if(this.tentTreeMap.containsKey(changeCell)){//Case 5
+//				this.treeTentMap.remove(this.tentTreeMap.get(changeCell), changeCell);
+//				this.tentTreeMap.remove(changeCell);
+//				this.treeTentMap.put(pairTree, changeCell);
+//				this.tentTreeMap.put(changeCell, pairTree);
+//			}else {// Case 6
+//				this.treeTentMap.put(pairTree, changeCell);
+//				this.tentTreeMap.put(changeCell, pairTree);
+//			}
+//		}
+				
 	}
-
-	//When done running, pairing in the maps should no longer exist
-	public void decouplePairing(Cell tent, Cell tree) {
-
+	
+	//When done running, pairing in the maps should no longer exist, neither 
+	public void decouplePairings(Cell tent, Cell tree) {
+		this.tentTreeMap.remove(tent);
+		this.treeTentMap.remove(tree);
 	}
 
 	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
