@@ -105,7 +105,7 @@ public class Solver {
 		//			
 		//		}
 		//	
-		boolean runOfficials = true;
+		boolean runOfficials = false;
 		if (runOfficials) {
 			boolean continueRunning = true;
 			HashSet<Integer> improvedFiles = new HashSet<Integer>();
@@ -156,11 +156,11 @@ public class Solver {
 				System.out.println("Improved File - " + file);
 			}
 		} else {
-			int inputGroupNum = 964;
+			int inputGroupNum = 1011;
 			String inputFileName = "input_group" + inputGroupNum + ".txt";
 			String inputFileFolder = "officialInputs";
 			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-			String outputFileFolder = "officialOutputs";
+			String outputFileFolder = "testingOutputFiles";
 			String inputFile = inputFileFolder + "/" + inputFileName;
 			String outputFile = outputFileFolder + "/" + outputFileName;
 
@@ -169,7 +169,7 @@ public class Solver {
 			solvee.readInput(inputFile);
 			solvee.calcInitialViolationCount();
 			solvee.generateInitialSol();
-			solvee.solve(inputFile);
+			solvee.solveWithIssues(inputFile, outputFile);
 
 			int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
 			if (solvee.getSolViolationCount() < previousViolationCount) {
@@ -237,7 +237,7 @@ public class Solver {
 		availableCells2.removeAll(this.availableCells);
 		availableCells2.removeAll(this.gameGrid.getTrees());
 		this.availableCells.clear();
-		this.availableCells = availableCells2;
+		this.availableCells = new ArrayList<Cell>(availableCells2);
 		this.temperature = initialTemp;
 		while (this.temperature > 0) {
 			annealRowsCols();
@@ -264,7 +264,7 @@ public class Solver {
 				this.solTentsPlaced = this.gameGrid.getTents().size();
 				this.updateSolutionPairings();
 			}
-//			this.updateCurPairings();
+			this.updateCurPairings();
 //			this.curOutputToFile(outputFile);
 //			this.printCurOutput();
 //			System.out.println();
@@ -283,10 +283,12 @@ public class Solver {
 		ArrayList<Cell> availableCells2 = new ArrayList<Cell>();
 		for (int row = 0; row < this.rows; row++) {
 			for (int col = 0; col < this.cols; col++) {
-				availableCells2.add(this.gameGrid.getCell(row, col));
+				Cell cell = this.gameGrid.getCell(row, col);
+				if(!this.availableCells.contains(cell)) {
+					availableCells2.add(this.gameGrid.getCell(row, col));
+				}
 			}
 		}
-		availableCells2.removeAll(this.availableCells);
 		availableCells2.removeAll(this.gameGrid.getTrees());
 		this.availableCells.clear();
 		this.availableCells = availableCells2;
@@ -359,7 +361,7 @@ public class Solver {
 		 * else it should be an empty cell, do cases below
 		 * 	add a tent
 		 * */
-		//		this.printGrid(chosenCell);
+		this.printGrid(chosenCell);
 		int violationChange = calcViolationChangeRowsCols(chosenCell);
 		if (this.rand.nextDouble() < this.acceptanceProb(violationChange)) {
 			this.curViolationCount += violationChange;
@@ -905,7 +907,6 @@ public class Solver {
 			this.colTents = new int[this.cols];
 			this.curRowTents = new int[this.rows];
 			this.curColTents = new int[this.cols];
-			this.gameGrid = new GameGrid(this.rows, this.cols);
 
 			for (int row = 0; row < this.rows; row++) {
 				this.rowTents[row] = sc.nextInt();
