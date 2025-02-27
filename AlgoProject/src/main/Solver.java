@@ -156,11 +156,11 @@ public class Solver {
 				System.out.println("Improved File - " + file);
 			}
 		} else {
-			int inputGroupNum = 1005;
+			int inputGroupNum = 1016;
 			String inputFileName = "input_group" + inputGroupNum + ".txt";
 			String inputFileFolder = "officialInputs";
 			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-			String outputFileFolder = "testingOutputFiles";
+			String outputFileFolder = "officialOutput";
 			String inputFile = inputFileFolder + "/" + inputFileName;
 			String outputFile = outputFileFolder + "/" + outputFileName;
 
@@ -191,7 +191,7 @@ public class Solver {
 		this.colTents = null;
 		this.gameGrid = null;
 		this.temperature = 10;
-		this.coolingRate = 0.00001;
+		this.coolingRate = 0.000001;
 		this.treeTentMap = new HashMap<Cell, Cell>();
 		this.tentTreeMap = new HashMap<Cell, Cell>();
 		this.availableCells = new ArrayList<Cell>();
