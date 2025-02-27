@@ -108,11 +108,11 @@ public class Solver {
 		//			
 		//		}
 		//	
-		boolean runOfficials = true;
+		boolean runOfficials = false;
 		if (runOfficials) {
 			boolean continueRunning = true;
 			HashSet<Integer> improvedFiles = new HashSet<Integer>();
-			int[] filesToIgnore = { 975, 976, 989, 998, 1001, 1004, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1014, 1015, 1020 };
+			int[] filesToIgnore = {973, 975, 976, 989, 998, 1001, 1004, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1014, 1015, 1020 };
 			while (continueRunning) {
 				int filesImproved = 0;
 				for (int inputGroupNum = 963; inputGroupNum < 1025; inputGroupNum++) {
@@ -158,7 +158,7 @@ public class Solver {
 				System.out.println("Improved File - " + file);
 			}
 		} else {
-			int inputGroupNum = 1019;
+			int inputGroupNum = 1016;
 			String inputFileName = "input_group" + inputGroupNum + ".txt";
 			String inputFileFolder = "officialInputs";
 			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
@@ -184,6 +184,7 @@ public class Solver {
 			}
 
 			Verifier finalVerify = new Verifier(inputFile, outputFile);
+			System.out.println(" ~ ~ ~ Simulation Complete ~ ~ ~ ");
 		}
 		
 		
