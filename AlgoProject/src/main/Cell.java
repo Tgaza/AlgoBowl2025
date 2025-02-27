@@ -42,6 +42,23 @@ public class Cell {
 		this.pairedCells = new ArrayList<>();
 	}
 	
+	//copy constructor
+	public Cell(Cell other) {
+	    this.row = other.row;
+	    this.col = other.col;
+	    this.symbol = other.symbol;
+	    this.isTree = other.isTree;
+	    this.isTent = other.isTent;
+	    
+	    // Copy the adjacency lists
+	    this.diagAdjList = new ArrayList<>(other.diagAdjList);
+	    this.cardinalAdjList = new ArrayList<>(other.cardinalAdjList);
+	    
+	    // Copy the paired cells list
+	    this.pairedCells = new ArrayList<>(other.pairedCells);
+	}
+
+	
 	@Override
 	public String toString() {
 		return "" + this.symbol;

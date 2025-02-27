@@ -14,24 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 
-/**
- * -TODO: Create new Offical Folder to pull solutions/Inputfiles from
- * -TODO: Ensure one indexed output !!!
- * 
- * 
- * -TODO: Incorect num of violations <- INVALID
- * -TODO: Tent Superposition (Tent cannot overlap with existing entity) <- INVALID
- * -TODO: Cant Fall off edge of world <- INVALID
- * -TODO: Tent cannot be paired with non-tree entity <-INVALID
- * -TODO: File must have proper formatting + No missing/corrupt data <- INVALID
- * 
- * 
- * -TODO: Cant be an unpaired entity <- Violation
- * -TODO: Multiple adjenecies != multiple violations (Specifially with Tents) <- Violation
- * -TODO: A row or column which has too many or too few tents causes multiple violations: one violation for each tent to many or too few<- Violation 
- * 
- * When complete, "todo" -> "fixme"
- */
 public class Verifier {
 	private GameGrid grid;
 	private Scanner scanner;
@@ -41,9 +23,6 @@ public class Verifier {
 	
 	private int rows;
 	private int columns;
-	
-	private int[] tentRowCount;
-	private int[] tentColumnCount;
 	
 	private int[] desiredTentRowCount;
 	private int[] desiredTentColumnCount;
@@ -55,11 +34,7 @@ public class Verifier {
 	
 	private int totalViolations = 0;
 	
-	//bad but it does work
-	public Set<Cell> tents = new HashSet<>();
-	public Set<Cell> trees = new HashSet<>();
-	public int numTents;
-	public int numTrees;
+	
 	
 	public static void main(String[] args) {
 		//this is some temporary bull shit just to get the program to run with files plugged in manually
@@ -71,6 +46,7 @@ public class Verifier {
 	public Verifier() {
 		super();
 	}
+
 	
 	//Main code for running the verifier
 	public Verifier(String inputFile, String outputFile) {
@@ -87,7 +63,7 @@ public class Verifier {
 		
 		
 		//Total number of violations made
-		totalViolations = sumViolations();
+		totalViolations = sumViolations(grid);
 		
 		//just for testing purposes
 //		System.out.println(rowViolations);
@@ -95,6 +71,7 @@ public class Verifier {
 //		System.out.println(adjViolations);
 //		System.out.println(pairViolations);
 //		System.out.println(totalViolations);
+		
 		
 		if(totalViolations != claimedViolations) {
 			exitProgram();
@@ -104,16 +81,16 @@ public class Verifier {
 		
 	}
 	
-	public int sumViolations() {
-		int rowViolations = checkRowViolations();
+	public int sumViolations(GameGrid g) {
+		int rowViolations = checkRowViolations(g);
 		
-		int columnViolations = checkColumnViolations();
+		int columnViolations = checkColumnViolations(g);
 		
 		//check how many violations are caused by adjacent tents
-		int adjViolations = checkAdjViolations();
+		int adjViolations = checkAdjViolations(g);
 		
 		//check how many violations there are in terms of pairing
-		int pairViolations = checkPairViolations();
+		int pairViolations = checkPairViolations(g);
 		
 //		System.out.println(rowViolations);
 //		System.out.println(columnViolations);
@@ -123,30 +100,30 @@ public class Verifier {
 		return rowViolations + columnViolations + adjViolations + pairViolations;
 	}
 	
-	//These functions are used for debugging purposes
-	//Prints out a copy of the input file
-//	private void printGrid() {
-//		for(int r = 0; r < rows; r++) {
-//			System.out.print(desiredTentRowCount[r] + " ");
-//		}
-//		
-//		System.out.println();
-//		
-//		for(int c = 0; c < columns; c++) {
-//			System.out.print(desiredTentColumnCount[c] + " ");
-//		}
-//		
-//		System.out.println();
-//		
-//		for(int r = 0; r < rows; r++) {
-//			for(int c = 0; c < columns; c++) {
-//				System.out.print(grid.getCell(r, c).getSymbol());
-//			}
-//			System.out.println();
-//		}
-//		
-//		System.out.println();
-//	}
+//	These functions are used for debugging purposes
+//	Prints out a copy of the input file
+	private void printGrid() {
+		for(int r = 0; r < rows; r++) {
+			System.out.print(desiredTentRowCount[r] + " ");
+		}
+		
+		System.out.println();
+		
+		for(int c = 0; c < columns; c++) {
+			System.out.print(desiredTentColumnCount[c] + " ");
+		}
+		
+		System.out.println();
+		
+		for(int r = 0; r < rows; r++) {
+			for(int c = 0; c < columns; c++) {
+				System.out.print(grid.getCell(r, c).getSymbol());
+			}
+			System.out.println();
+		}
+		
+		System.out.println();
+	}
 	
 	//Prints out a list of the detected counts of tents for each set of rows and columns
 //	private void printTentCounts() {
@@ -177,35 +154,35 @@ public class Verifier {
 	}
 	
 	//checks the number of row violations
-	private int checkRowViolations() {
+	private int checkRowViolations(GameGrid g) {
 		int violations = 0;
-		for(int r = 0; r < rows; r++) {
-			if(desiredTentRowCount[r] != tentRowCount[r]) {
-				violations = violations + Math.abs(desiredTentRowCount[r] - tentRowCount[r]);
+		for(int r = 0; r < g.getRows(); r++) {
+			if(desiredTentRowCount[r] != g.getTentRowCount()[r]) {
+				violations = violations + Math.abs(desiredTentRowCount[r] - g.getTentRowCount()[r]);
 			}
 		}
 		return violations;
 	}
 	
 	//counts the number of column violations
-	private int checkColumnViolations() {
+	private int checkColumnViolations(GameGrid g) {
 		int violations = 0;
-		for(int c = 0; c < columns; c++) {
+		for(int c = 0; c < g.getCols(); c++) {
 //			System.out.println("DesiredTentColCount: " + desiredTentColumnCount[c]);
 //			System.out.println("TentColumnCount: " + tentColumnCount[c]);
-			if(desiredTentColumnCount[c] != tentColumnCount[c]) {
-				violations = violations + Math.abs(desiredTentColumnCount[c] - tentColumnCount[c]);
+			if(desiredTentColumnCount[c] != g.getTentColumnCount()[c]) {
+				violations = violations + Math.abs(desiredTentColumnCount[c] - g.getTentColumnCount()[c]);
 			}
 		}
 		return violations;
 	}
 	
 	//checks the number of Adjacent Violations
-	private int checkAdjViolations() {
+	private int checkAdjViolations(GameGrid g) {
 		int violations = 0;
-		for(int r = 0; r < rows; r++) {
-			for(int c = 0; c < columns; c++) {
-				Cell currCell = grid.getCell(r, c);
+		for(int r = 0; r < g.getRows(); r++) {
+			for(int c = 0; c < g.getCols(); c++) {
+				Cell currCell = g.getCell(r, c);
 				char cellSymbol = currCell.getSymbol();
 				
 				if(cellSymbol == '^') {
@@ -240,11 +217,11 @@ public class Verifier {
 	}
 	
 	//checks the number of Pairing Violations
-	private int checkPairViolations() {
+	private int checkPairViolations(GameGrid g) {
 		int violations = 0;
-		for(int r = 0; r < rows; r++) {
-			for(int c = 0; c < columns; c++) {
-				Cell cell = grid.getCell(r, c);
+		for(int r = 0; r < g.getRows(); r++) {
+			for(int c = 0; c < g.getCols(); c++) {
+				Cell cell = g.getCell(r, c);
 				if(cell.getSymbol() != '.') {
 					List<Cell> cellPairs = cell.getPairedCells();
 					if(cellPairs.size() > 1) {
@@ -278,12 +255,12 @@ public class Verifier {
 	}
 	
 	//reads in the grid information of the input file and builds the grid
-	public void buildBaseGrid() {
+	public GameGrid buildBaseGrid(String path) {
 		try {
-	        scanner = new Scanner(new File(inputFile)); // Corrected Scanner initialization
+	        scanner = new Scanner(new File(path)); // Corrected Scanner initialization
 	    } catch (FileNotFoundException e) {
-	        System.err.println("Error: File not found - " + inputFile);
-	        return;
+	        System.err.println("Error: File not found - " + path);
+	        exitProgram();
 	    }
 		
 		//Get grid dimensions
@@ -305,7 +282,15 @@ public class Verifier {
 				String[] rowElements = getElementsFromLine();
 				for(int c = 0; c < columns; c++) {
 					//This is hella scuffed but it just sets the symbol properly
-					grid.getCell(r, c).setSymbol(rowElements[0].charAt(c));
+					char symbol = rowElements[0].charAt(c);
+					grid.getCell(r, c).setSymbol(symbol);
+					
+					if(symbol == 'T') {
+						grid.addTree(grid.getCell(r, c));
+					}
+					if(symbol == '.') {
+						grid.addEmpty(grid.getCell(r, c));
+					}
 				}
 			}
 		}
@@ -313,6 +298,8 @@ public class Verifier {
 		//Function is used for testing
 		//printGrid();
 		scanner.close();
+		
+		return grid;
 	}
 	
 	//checks to make sure the correct number of arguments are provided from the output file
@@ -382,8 +369,8 @@ public class Verifier {
 		Set<Cell> tentSet = new HashSet<>();
 		
 		//initialize the size of the tent row and tree counts
-		tentRowCount = new int[rows];
-		tentColumnCount = new int[columns];
+//		tentRowCount = new int[rows];
+//		tentColumnCount = new int[columns];
 		
 		//loop through the lines that contain the coordinate 
 		while(scanner.hasNextLine()) {
@@ -413,9 +400,8 @@ public class Verifier {
 				currCell.setSymbol('^');
 				
 				//adjust row and column tent counts
-				tentRowCount[r]++;
-				tentColumnCount[c]++;
-				
+				grid.addTentRowCol(currCell);
+
 				//increase the number of tents
 				actualTentCount++;
 				
@@ -451,14 +437,14 @@ public class Verifier {
 		placeTents();
 		
 		//Methods used for testing
-		//printGrid();
+		printGrid();
 		//printTentCounts();
 		
 	}
 	
 	//builds the grid for the verifier
 	public void readInput() {
-		buildBaseGrid();
+		buildBaseGrid(inputFile);
 		buildGridWithTents();
 	}
 
@@ -478,29 +464,6 @@ public class Verifier {
 		return totalViolations;
 	}
 
-	public void increaseTentRowCount(int index) {
-		tentRowCount[index]++;
-	}
 	
-	public void increaseTentColumnCount(int index) {
-		tentColumnCount[index]++;
-	}
-	
-	public void decreaseTentRowCount(int index) {
-		tentRowCount[index]--;
-	}
-	
-	public void decreaseTentColumnCount(int index) {
-		tentColumnCount[index]--;
-	}
-	
-	public void initializeTentRowCount() {
-		tentRowCount = new int[rows];
-	}
-	
-	public void initializeTentColumnCount() {
-		tentColumnCount = new int[columns];
-	}
-
 	
 }

@@ -12,22 +12,13 @@ import java.util.Set;
 
 import java.util.Random;
 import java.util.Iterator;
-import java.util.List;
+//import java.util.List;
 /**
  * -TODO: Solver
  */
-public class Solver {
-	private Verifier gridToSolve;
-	
-	//these need to be added to the verifier so that they don't get overwritten
-//	private Set<Cell> tents = new HashSet<>();
-//	private Set<Cell> trees = new HashSet<>();
-//	private int numTents;
-//	private int numTrees;
-	
-	private int rows;
-	private int columns;
-	private int numCells;
+public class Solver {	
+	Verifier verifier;
+	GameGrid grid;
 	
 	private double coolingRate;
 	private double initialTemp;
@@ -39,210 +30,181 @@ public class Solver {
 	
 	public Solver() {
 		super();
-		this.gridToSolve = new Verifier();
 		
-		this.gridToSolve.setInputFile("data/testingInputs/basicIn.txt");
-		this.gridToSolve.buildBaseGrid();
+		this.verifier = new Verifier();
+		this.grid = verifier.buildBaseGrid("data/testingInputs/test15x15_1.txt");
 		
-		this.rows = gridToSolve.getGrid().getRows();
-		this.columns = gridToSolve.getGrid().getCols();
-		
-		this.gridToSolve.initializeTentRowCount();
-		this.gridToSolve.initializeTentColumnCount();
-		
-//		System.out.println(rows + " " + columns);
-		
-		//fills all empty space with trees
-		fillEmptySpacesWithTents();
-		
-		this.coolingRate = 0.97;
-		
-		this.numCells = rows*columns;
+		int numCells = grid.getNumCells();
 		
 		if(numCells > 10000) {
-			this.initialTemp = 50000;
-		} else if(numCells > 1000) {
 			this.initialTemp = 5000;
-		} else {
+		} else if(numCells > 1000) {
 			this.initialTemp = 500;
+		} else {
+			this.initialTemp = 50;
 		}
 		
 		this.maxIterations = 100*numCells;
+		this.coolingRate = 0.99;
 		
-		Verifier solution = simAnneal(maxIterations, initialTemp, coolingRate);
+		//randomly fill grid with tents before starting annealing
+//		randomlyFillGrid();
+		printGrid(grid);
+		System.out.println();
 		
-//		gridToSolve = solution;
+		GameGrid solution = simAnneal(maxIterations, initialTemp, coolingRate);
 		
-		printGrid();
-		System.out.println("Total violations: " + solution.sumViolations());
+		printGrid(solution);
+		System.out.println("Total violations: " + verifier.sumViolations(solution));
 	}
 	
 	//for debugging purposes
-	private void printGrid() {
-		GameGrid grid = gridToSolve.getGrid();
-		
-		for(int r = 0; r < rows; r++) {
-			for(int c = 0; c < columns; c++) {
-				System.out.print(grid.getCell(r, c).getSymbol() + " ");
+	private void printGrid(GameGrid g) {		
+		for(int r = 0; r < g.getRows(); r++) {
+			for(int c = 0; c < g.getCols(); c++) {
+				System.out.print(g.getCell(r, c).getSymbol() + " ");
 			}
 			System.out.println();
 		}
 	}
 	
-	private void fillEmptySpacesWithTents() {
-		for(int r = 0; r < rows; r++) {
-			for(int c = 0; c < columns; c++) {
-				
-				Cell currCell = gridToSolve.getGrid().getCell(r, c);
-				if(currCell.getSymbol() == '.') {
-					gridToSolve.getGrid().getCell(r, c).setSymbol('^');
-					gridToSolve.increaseTentRowCount(r);
-					gridToSolve.increaseTentColumnCount(c);
-					gridToSolve.tents.add(currCell);
-					gridToSolve.numTents++;
-				}
-				if(currCell.getSymbol() == 'T') {
-					gridToSolve.trees.add(currCell);
-					gridToSolve.numTrees++;
-				}
-			}
-		}
-		
-		//for debugging
-		printGrid();
-		System.out.println("Total violations: " + gridToSolve.sumViolations());
+	
+	
+	//randomly fill the grid
+//	private void randomlyFillGrid() {
+//		for(int r = 0; r < grid.getRows(); r++) {
+//			for(int c = 0; c < grid.getCols(); c++) {
+//				Cell currCell = grid.getCell(r, c);
+//				char symbol = currCell.getSymbol();
+//				
+//				if(symbol == '.') {
+//					Random rand = new Random();
+//					if(rand.nextDouble() < 0.15) {
+//						currCell.setSymbol('^');
+//						grid.rmEmpty(currCell);
+//						grid.addTentRowCol(r, c);
+//					}
+//				}
+//			}
+//		}
+//	}
+	
+
+	private void deleteTent(GameGrid g, Cell cell) {
+		g.rmTentRowCol(cell);
+		g.addEmpty(cell);
 	}
 	
-	private void deleteTent(Cell cell, Verifier verifier) {
-		cell.setSymbol('.');
-		verifier.numTents--;
-	}
-	
-	private void unPair(Cell cell) {
-		Cell pairedCell = cell.getPairedCells().getFirst();
+	private void unPair(Cell cell, Cell neighbor) {
    	 	cell.getPairedCells().removeFirst();
-   	 	pairedCell.getPairedCells().removeFirst();
+   	 	neighbor.getPairedCells().removeFirst();
 	}
 	
 	//creates pairing from list of available cells
-	private void createPairing(Cell cell, Set<Cell> nearByTrees) {
-		 //convert set to iterator
-		 Iterator<Cell> iterator = nearByTrees.iterator();
-		 Cell pairedCell = iterator.next();
-		 //create pair
-		 cell.addPairedCell(pairedCell);
-		 pairedCell.addPairedCell(cell);
+	private void createPairing(Cell cell, Cell neighbor) {
+		 cell.addPairedCell(neighbor);
+		 neighbor.addPairedCell(cell);
 	}
 	
-	private Verifier modifyProblem(Verifier curr) {
-		Verifier next = curr;
-		int numMods;
+	private int genRandom(int upperBound, int lowerBound) {
+		Random rand = new Random();
+		return rand.nextInt(upperBound) + lowerBound;
+	}
+	
+	
+	private void removeCell(GameGrid g) {
+		Iterator<Cell> iterator = g.getTents().iterator();
+		Cell cell = iterator.next();
 		
-		if(numCells > 10000) {
-			numMods = 20;
-		} else if(numCells > 1000) {
-			numMods = 5;
+		if(cell.getPairedCells().size() != 0) {
+			Cell neighbor = cell.getPairedCells().getFirst();
+			unPair(cell, neighbor);
+		}
+		
+		deleteTent(g, cell);
+	}
+	
+	private void addCell(GameGrid g) {
+		//select a random empty cell
+		Iterator<Cell> iterator = g.getEmpty().iterator();
+		Cell cell = iterator.next();
+		//check to see if the cell has neighboring trees, if it doesn't just add it, if it does, pair it to a random tree
+		Set<Cell> neighboringTrees = new HashSet<>();
+		for(Cell neighbor : cell.getCardinalAdjList()) {
+			if(neighbor.getSymbol() == 'T') {
+				neighboringTrees.add(neighbor);
+			}
+		}
+		
+		if(neighboringTrees.size() == 0) {
+			g.addTentRowCol(cell);
+			g.rmEmpty(cell);
 		} else {
-			numMods = 1;
+			iterator = neighboringTrees.iterator();
+			Cell neighbor = iterator.next();
+			g.addTentRowCol(cell);
+			g.rmEmpty(cell);
+			createPairing(cell, neighbor);
 		}
-		
-		Iterator<Cell> iterator = next.tents.iterator();
-		for(int i = 0; i < numMods; i++) {
-			if(next.tents.size() == 0) {
-				break;
-			}
-			Cell tent = iterator.next();
-			next.tents.remove(tent);
-			List<Cell> adjList = tent.getCardinalAdjList();
-			
-			Set<Cell> nearByTrees = new HashSet<>();
-			for(Cell cell : adjList) {
-				if(cell.getSymbol() == 'T') {
-					nearByTrees.add(cell);
-				}
-			}
-			
-			//just remove the tree if it's alone
-			if(nearByTrees.size() == 0) {
-				deleteTent(tent, next);
-			} else {
-				 Random rand = new Random();
-			     int randomNum = rand.nextInt(2) + 1;
-			     //if 1 delete, if 2 don't
-			     if(randomNum == 1) {
-			    	 //check to see if paired, because if paired, you got to unpair the paired set
-			    	 if(tent.getPairedCells().size() == 0) {
-			    		 deleteTent(tent, next);
-			    	 } else {
-			    		 deleteTent(tent, next);
-				    	 //removes the pairing between the two cells
-				    	 unPair(tent);
-			    	 }
-			     } else {
-			    	 //first if the tent is not paired yet, we randomly choose what cell to pair it to
-			    	 if(tent.getPairedCells().size() == 0) {
-			    		 createPairing(tent, nearByTrees);
-			    	 } else {
-			    		 //first off make sure that there is more than one tent to pair too, otherwise we're just going to delete the cell
-			    		 if(tent.getPairedCells().size() > 1) {
-			    			 //first remove the cell that the tent was currently paired to from the list of total possible cells to pair to
-			    			 Cell currPair = tent.getPairedCells().getFirst();
-			    			 nearByTrees.remove(currPair);
-			    			 //now delete the previous pairing
-			    			 unPair(tent);
-			    			 //now create pairing
-			    			 createPairing(tent, nearByTrees);
-			    		 } else {
-			    			 //we also need to remove the existing pairing
-			    			 unPair(tent);
-			    			 
-			    			 deleteTent(tent, next);
-			    		 }
-			    	 }
-			     }
-			}	
-		}
-		
-		
-		return next;
 	}
 	
-	private Verifier simAnneal(int maxIterations, double initialTemp, double coolingRate) {
-		//set up for simulated annealing
-		Verifier currentSolution = gridToSolve;
-		int currentCost = currentSolution.sumViolations();
-		
-		Verifier bestSolution = currentSolution;
-		int bestCost = currentCost;
-		
-		double temperature = initialTemp;
-		
-		for(int i = 0; i < maxIterations; i++) {
-			if(temperature <= 0) {
-				break;
-			}
-			
-			Verifier newSolution = modifyProblem(bestSolution);
-			int newCost = newSolution.sumViolations();
-			
-			int costDifference = newCost - currentCost;
-			
-			if(costDifference < 0 || Math.exp(-costDifference / temperature) > Math.random()) {
-				currentSolution = newSolution;
-				currentCost = newCost;
-			}
-			
-			if(currentCost < bestCost) {
-				bestSolution = currentSolution;
-				bestCost = currentCost;
-			}
-			
-			temperature = temperature * coolingRate;
-			
-			printGrid();
-			System.out.println("Total violations: " + newCost);
-		}
-		
-		return bestSolution;
+	private GameGrid modifyProblem(GameGrid g) {
+	    GameGrid next = new GameGrid(g); // Use the copy constructor
+	    int random = genRandom(2, 0);
+
+	    if (random == 0) {
+	        if (next.getTents().size() != 0) {
+	            removeCell(next);
+	        } else {
+	            addCell(next);
+	        }
+	    } else {
+	        if (next.getEmpty().size() != 0) {
+	            addCell(next);
+	        } else {
+	            removeCell(next);
+	        }
+	    }
+
+	    return next;
 	}
+
+	private GameGrid simAnneal(int maxIterations, double initialTemp, double coolingRate) {
+	    GameGrid currentSolution = new GameGrid(grid); // Copy the initial grid
+	    int currentCost = verifier.sumViolations(currentSolution);
+
+	    GameGrid bestSolution = new GameGrid(currentSolution);
+	    int bestCost = currentCost;
+
+	    double temperature = initialTemp;
+
+	    for (int i = 0; i < maxIterations; i++) {
+	        if (temperature <= 0) {
+	            break;
+	        }
+
+	        GameGrid newSolution = modifyProblem(currentSolution);
+	        int newCost = verifier.sumViolations(newSolution);
+
+	        int costDifference = newCost - currentCost;
+
+	        if (costDifference < 0 || Math.exp(-costDifference / temperature) > Math.random()) {
+	            currentSolution = new GameGrid(newSolution);
+	            currentCost = newCost;
+	        }
+
+	        if (currentCost < bestCost) {
+	            bestSolution = new GameGrid(currentSolution);
+	            bestCost = currentCost;
+	        }
+
+	        temperature *= coolingRate;
+
+	        printGrid(currentSolution);
+	        System.out.println("Total violations: " + newCost);
+	    }
+
+	    return bestSolution;
+	}
+
 }
