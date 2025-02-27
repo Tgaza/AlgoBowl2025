@@ -24,20 +24,76 @@ public class GameGrid {
 	private Cell[][] grid;
 	private Set<Cell> trees;
 	private Set<Cell> tents;
+	private Set<Cell> empty;
+	
+	private int[] tentRowCount;
+	private int[] tentColumnCount;
+	
+	private int numTents;
+	private int numTrees;
+	private int numEmpty;
+	
+	private int numCells;
 
 	public GameGrid(int rows, int cols) {
 		this.rows = rows;
 		this.cols = cols;
+		this.numCells = rows*cols;
+		
 		this.grid = new Cell[rows][cols];
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				grid[row][col] = new Cell(row, col);
 			}
 		}
+		
+		this.tentRowCount = new int[this.rows];
+		this.tentColumnCount = new int[this.cols];
+		
 		this.trees = new HashSet<>();
 		this.tents = new HashSet<>();
+		this.empty = new HashSet<>();
 		this.initializeAdjLists();
 	}
+	
+	//copy constructor
+	public GameGrid(GameGrid other) {
+	    this.rows = other.rows;
+	    this.cols = other.cols;
+	    this.numCells = other.numCells;
+
+	    this.grid = new Cell[rows][cols];
+	    for (int row = 0; row < rows; row++) {
+	        for (int col = 0; col < cols; col++) {
+	            this.grid[row][col] = new Cell(other.grid[row][col]);
+	        }
+	    }
+
+	    this.tentRowCount = other.tentRowCount.clone();
+	    this.tentColumnCount = other.tentColumnCount.clone();
+
+	    this.numTents = other.numTents;
+	    this.numTrees = other.numTrees;
+	    this.numEmpty = other.numEmpty;
+
+	    this.trees = new HashSet<>();
+	    for (Cell tree : other.trees) {
+	        this.trees.add(this.grid[tree.getRow()][tree.getCol()]);
+	    }
+
+	    this.tents = new HashSet<>();
+	    for (Cell tent : other.tents) {
+	        this.tents.add(this.grid[tent.getRow()][tent.getCol()]);
+	    }
+
+	    this.empty = new HashSet<>();
+	    for (Cell emptyCell : other.empty) {
+	        this.empty.add(this.grid[emptyCell.getRow()][emptyCell.getCol()]);
+	    }
+
+	    this.initializeAdjLists();
+	}
+
 
 	private void initializeAdjLists() {
 		for (int row = 0; row < rows; row++) {
@@ -188,9 +244,86 @@ public class GameGrid {
 	public Set<Cell> getTents() {
 		return this.tents;
 	}
+	
+
+	public Set<Cell> getEmpty() {
+		return empty;
+	}
 
 	public Cell getCell(int row, int col) {
 		return this.grid[row][col];
 	}
+
+	public int getRows() {
+		return rows;
+	}
+
+	public int getCols() {
+		return cols;
+	}
+	
+	public void addTentRowCol(Cell cell) {
+		cell.setSymbol('^');
+		tents.add(cell);
+		tentRowCount[cell.getRow()]++;
+		tentColumnCount[cell.getCol()]++;
+		numTents++;
+	}
+	
+	public void rmTentRowCol(Cell cell) {
+		cell.setSymbol('.');
+		tents.remove(cell);
+		tentRowCount[cell.getRow()]--;
+		tentColumnCount[cell.getCol()]--;
+		numTents--;
+	}
+	
+	public void addTree(Cell cell) {
+		cell.setSymbol('T');
+		trees.add(cell);
+		numTrees++;
+	}
+	
+	public void rmTree(Cell cell) {
+		cell.setSymbol('.');
+		trees.remove(cell);
+		numTrees--;
+	}
+	
+	public void addEmpty(Cell cell) {
+		empty.add(cell);
+		numEmpty++;
+	}
+	
+	public void rmEmpty(Cell cell) {
+		empty.remove(cell);
+		numEmpty--;
+	}
+
+	public int getNumTents() {
+		return numTents;
+	}
+
+	public int getNumTrees() {
+		return numTrees;
+	}
+
+	public int getNumEmpty() {
+		return numEmpty;
+	}
+
+	public int[] getTentRowCount() {
+		return tentRowCount;
+	}
+
+	public int[] getTentColumnCount() {
+		return tentColumnCount;
+	}
+
+	public int getNumCells() {
+		return numCells;
+	}
+	
+	
 
 }
