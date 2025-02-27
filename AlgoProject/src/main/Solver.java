@@ -158,7 +158,7 @@ public class Solver {
 				System.out.println("Improved File - " + file);
 			}
 		} else {
-			int inputGroupNum = 1016;
+			int inputGroupNum = 1019;
 			String inputFileName = "input_group" + inputGroupNum + ".txt";
 			String inputFileFolder = "officialInputs";
 			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
