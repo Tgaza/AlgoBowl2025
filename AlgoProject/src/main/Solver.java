@@ -324,9 +324,10 @@ public class Solver {
 		
 	}
 	
-	//When done running, pairing in the maps should no longer exist
-	public void decouplePairing(Cell tent, Cell tree) {
-		
+	//When done running, pairing in the maps should no longer exist, neither 
+	public void decouplePairings(Cell tent, Cell tree) {
+		this.tentTreeMap.remove(tent);
+		this.treeTentMap.remove(tree);
 	}
 
 	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
