@@ -278,50 +278,112 @@ public class Solver {
 	 * - providing a tree that is already paired with another tent
 	 * - providing a tree to changeCell or tent to pairTree
 	 * 
-	 * Case 1: Empty Cell and no tree to pair
-	 * 	Result: Place tent with no pairing
-	 * Case 2: Empty Cell with tree to pair
-	 * 	Result: Place tent with paired tent
-	 * Case 3: tentCell with no paired tree, and pairTree is null
+	 * Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing
+	 * 	Result: pair the two together
+	 * Case 2: ChosenCell is a tent with a pairing, and ChosenPairTree has no pairing
+	 * 	Result: remove original pairing of ChosenCell and replace with a pairing with ChosenPairTree
+	 * Case 4: ChosenCell is a tent paired with ChosenPairTree
+	 * 	Result: remove tent and unpair
+	 * 
+	 * 
+	 * Case 3: ChosenCell is a tent with no pairing, and ChosenPairTree has a pairing
+	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
+	 * Case 5: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other
+	 * 	Result: decouple both pairings and pair tent to tree
+	 * Case 6: ChosenCell is empty, and ChosenPairTree has no pairing
+	 * 	Result: place tent and pair with tree
+	 * Case 7: ChosenCell is empty, and ChosenPairTree has a pairing
+	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
+	 * 
+	 * 
+	 *else, chosenPairTree is a non-tree so do one of the cases below
+	 * Case 8: ChosenCell is empty
+	 * 	Result: place tent with no pairing
+	 * Case 9: ChosenCell is a tent with no pairing
 	 * 	Result: remove tent
-	 * Case 4: tentCell with pairTree as it's current paired Tree
-	 * 	Result: remove tent and it's pairing
-	 * Case 5: tentCell with pairTree as a tree it is not paired with
-	 * 	Result: switch tent's pairing to new tree
-	 * Case 6: tentCell with no paired tree, and pairTree is not null
-	 * 	Result: switch tent's pairing to new tree
+	 * Case 10: ChosenCell is a tent with a pairing
+	 * 	Result: currently remove tent and it's pairing
 	*/
 	public void adjustCell(Cell changeCell, Cell pairTree) {
-		if (changeCell.getSymbol() == '.') {//Case 1
-			this.gameGrid.updateCell(changeCell, '^');
-			this.curRowTents[changeCell.getRow()]--;
-			this.curColTents[changeCell.getCol()]--;
-			if (pairTree != null) {//Case 2
-				this.treeTentMap.put(pairTree, changeCell);
-				this.tentTreeMap.put(changeCell, pairTree);
+		// Case 8 9 10 // Chnage Cell is Not a Tree
+		if ( (pairTree != null) && (!pairTree.isTree()) ) {
+			// Case 8: Chosen Cell is empty -> Put Tent
+			if (changeCell.getSymbol() == '.') {
+				this.gameGrid.updateCell(changeCell, '^');
 			}
-		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
-			this.gameGrid.updateCell(changeCell, '.');
-			this.curRowTents[changeCell.getRow()]++;
-			this.curColTents[changeCell.getCol()]++;
-			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
-				this.treeTentMap.remove(pairTree, changeCell);
-				this.tentTreeMap.remove(changeCell, pairTree);
+			else if (changeCell.getSymbol() == '^'){ // We must be a tent
+				 // Case 9,10
+				decouplePairings(changeCell, tentTreeMap.get(changeCell));
+				this.gameGrid.updateCell(changeCell, '.');
 			}
-		} else {// Cases 5/6
-			if(this.tentTreeMap.containsKey(changeCell)){//Case 5
-				this.treeTentMap.remove(this.tentTreeMap.get(changeCell), changeCell);
-				this.tentTreeMap.remove(changeCell);
-				this.treeTentMap.put(pairTree, changeCell);
-				this.tentTreeMap.put(changeCell, pairTree);
-			}else {// Case 6
-				this.treeTentMap.put(pairTree, changeCell);
-				this.tentTreeMap.put(changeCell, pairTree);
+			return;
+		}
+		// Case 1 and 3 // Tent no Tree pairs
+		if ( changeCell.getSymbol() == '^'){
+			if(!tentTreeMap.containsKey(changeCell)) {
+				if (pairTree != null) { // Gotta check to make sure that this jaunt aint null yeerd 
+					// Case 3,1 //
+					if(treeTentMap.containsKey(pairTree)) { // FIXME: HEY I FUCKED THIS BIGTIME
+						decouplePairings(changeCell, tentTreeMap.get(changeCell));
+						Cell oldTent = treeTentMap.get(pairTree);
+						tentTreeMap.remove(oldTent);
+						this.gameGrid.updateCell(oldTent, '.');
+					}
+					this.treeTentMap.put(pairTree, changeCell);
+					this.tentTreeMap.put(changeCell, pairTree);
+				}
+			}
+			else {
+				Cell oldPairTree = tentTreeMap.get(changeCell);
+				
+				if(pairTree == oldPairTree) { // Case 4
+					decouplePairings(pairTree, oldPairTree);
+					this.gameGrid.updateCell(changeCell, '.');
+				}
+				
+				else { // Case 2, 5
+					decouplePairings(pairTree, oldPairTree);
+					if (pairTree != null) {
+						if (treeTentMap.containsKey(pairTree)) {
+							decouplePairings(pairTree, null); // FIXME: HEY I FUCKED THIS TOO
+							this.gameGrid.updateCell(changeCell, '.');
+						}
+					}	
+					this.treeTentMap.put(pairTree, changeCell);
+					this.tentTreeMap.put(changeCell, pairTree);
+				}
 			}
 		}
-		
-		// FIXME:? May need to reset "fittness" (currentViolations)
-		
+//		else if ( changeCell.getSymbol() == '.')
+//		
+//		if (changeCell.getSymbol() == '.') {//Case 1
+//			this.gameGrid.updateCell(changeCell, '^');
+//			this.curRowTents[changeCell.getRow()]--;
+//			this.curColTents[changeCell.getCol()]--;
+//			if (pairTree != null) {//Case 2
+//				this.treeTentMap.put(pairTree, changeCell);
+//				this.tentTreeMap.put(changeCell, pairTree);
+//			}
+//		} else if(this.tentTreeMap.get(changeCell) == pairTree || pairTree == null){// Cases 3
+//			this.gameGrid.updateCell(changeCell, '.');
+//			this.curRowTents[changeCell.getRow()]++;
+//			this.curColTents[changeCell.getCol()]++;
+//			if (this.tentTreeMap.get(changeCell) == pairTree) {//Case 4
+//				this.treeTentMap.remove(pairTree, changeCell);
+//				this.tentTreeMap.remove(changeCell, pairTree);
+//			}
+//		} else {// Cases 5/6
+//			if(this.tentTreeMap.containsKey(changeCell)){//Case 5
+//				this.treeTentMap.remove(this.tentTreeMap.get(changeCell), changeCell);
+//				this.tentTreeMap.remove(changeCell);
+//				this.treeTentMap.put(pairTree, changeCell);
+//				this.tentTreeMap.put(changeCell, pairTree);
+//			}else {// Case 6
+//				this.treeTentMap.put(pairTree, changeCell);
+//				this.tentTreeMap.put(changeCell, pairTree);
+//			}
+//		}
+				
 	}
 	
 	//When done running, pairing in the maps should no longer exist, neither 
