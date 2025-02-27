@@ -75,9 +75,10 @@ public class Solver {
 	private Random rand = new Random();
 
 	public static void main(String[] args) {
-		String inputFileName = "input_group991.txt";
+		int inputGroupNum = 1001;
+		String inputFileName = "input_group" + 1001 + ".txt";
 		String inputFileFolder = "officialInputs";
-		String outputFileName = "output_group991_attempt_1.txt";
+		String outputFileName = "output_group" + 1001 + "_attempt_1.txt";
 		String outputFileFolder = "testingOutputFiles";
 		String inputFile = inputFileFolder + "/" + inputFileName;
 		String outputFile = outputFileFolder + "/" + outputFileName;
@@ -99,7 +100,7 @@ public class Solver {
 		this.colTents = null;
 		this.gameGrid = null;
 		this.temperature = 100;
-		this.coolingRate = 1;
+		this.coolingRate = 10;
 		this.treeTentMap = new HashMap<Cell, Cell>();
 		this.tentTreeMap = new HashMap<Cell, Cell>();
 		this.availableCells = new ArrayList<Cell>();
@@ -125,43 +126,41 @@ public class Solver {
 	}
 	
 	public void updateSolutionPairings() {
-		int linesToWrite = tentTreeMap.entrySet().size();
+		int linesToWrite = this.gameGrid.getTents().size();
+		if(linesToWrite == 0) {
+			return;
+		}
 		int curLine = 0;
 		this.solPairings = new String[linesToWrite];
-		Map.Entry<Cell, Cell> finalPair = null;
-		for (Map.Entry<Cell, Cell> pair : tentTreeMap.entrySet()) {
+		String finalTreeDir = "";
+		int finalTentRow = 0;
+		int finalTentCol = 0;
+		for(Cell tent: this.gameGrid.getTents()) {
+			String treeDir = "X";
+			if(this.tentTreeMap.containsKey(tent)) {
+				Cell pairedTree = this.tentTreeMap.get(tent);
+				int rowDiff = tent.getRow()-pairedTree.getRow();
+				int colDiff = tent.getCol()-pairedTree.getCol();
+				if(rowDiff == 1) {
+					treeDir = "U";
+				}else if(rowDiff == -1) {
+					treeDir = "D";
+				}else if(colDiff == 1) {
+					treeDir = "L";
+				}else if(colDiff == -1) {
+					treeDir = "R";
+				}
+			}
 			if(curLine == linesToWrite-1) {
-				finalPair = pair;
+				finalTreeDir = treeDir;
+				finalTentRow = tent.getRow();
+				finalTentCol = tent.getCol();
 				break;
 			}
-			int rowDiff = pair.getKey().getRow()-pair.getValue().getRow();
-			int colDiff = pair.getKey().getCol()-pair.getValue().getCol();
-			String treeDir = "";
-			if(rowDiff == 1) {
-				treeDir = "U";
-			}else if(rowDiff == -1) {
-				treeDir = "D";
-			}else if(colDiff == 1) {
-				treeDir = "L";
-			}else if(colDiff == -1) {
-				treeDir = "R";
-			}
-			this.solPairings[curLine] = ((pair.getKey().getRow()+1) + " " + (pair.getKey().getCol()+1) + " " + treeDir + "\n");
+			this.solPairings[curLine] = ((tent.getRow()+1) + " " + (tent.getCol()+1) + " " + treeDir + "\n");
 			curLine++;
 		}
-		int rowDiff = finalPair.getKey().getRow()-finalPair.getValue().getRow();
-		int colDiff = finalPair.getKey().getCol()-finalPair.getValue().getCol();
-		String treeDir = "";
-		if(rowDiff == 1) {
-			treeDir = "U";
-		}else if(rowDiff == -1) {
-			treeDir = "D";
-		}else if(colDiff == 1) {
-			treeDir = "L";
-		}else if(colDiff == -1) {
-			treeDir = "R";
-		}
-		this.solPairings[curLine] = ((finalPair.getKey().getRow()+1) + " " + (finalPair.getKey().getCol()+1) + " " + treeDir);
+		this.solPairings[curLine] = ((finalTentRow+1) + " " + (finalTentCol+1) + " " + finalTreeDir);
 	}
 	
 	
@@ -170,26 +169,40 @@ public class Solver {
 		Cell chosenCell = this.availableCells.get(this.rand.nextInt(0, totalValidCells));
 		ArrayList<Cell> availablePairings = chosenCell.getCardinalAdjList();
 		int totalAvailablePairings = availablePairings.size();
-		int chosenPairDecision = this.rand.nextInt(0, totalAvailablePairings+1);
-		Cell chosenPairTree = null;
-		if(chosenPairDecision == totalAvailablePairings) {
-			if(this.tentTreeMap.containsKey(chosenCell)) {
-				chosenPairTree = this.tentTreeMap.get(chosenCell);
-			} else {
-				chosenPairTree = null;
-			}
+		int chosenPairDecision = this.rand.nextInt(0, totalAvailablePairings);
+		Cell chosenPairTree = availablePairings.get(chosenPairDecision);
+		/*if chosenPairTree is a tree, then do one of the cases below
+		 * Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing
+		 * 	Result: pair the two together
+		 * Case 2: ChosenCell is a tent with a pairing, and ChosenPairTree has no pairing
+		 * 	Result: remove original pairing of ChosenCell and replace with a pairing with ChosenPairTree
+		 * Case 3: ChosenCell is a tent with no pairing, and ChosenPairTree has a pairing
+		 * 	Result: decouple paired tree's pairing and pair tent with pairtree
+		 * Case 4: ChosenCell is a tent paired with ChosenPairTree
+		 * 	Result: remove tent and unpair
+		 * Case 5: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other
+		 * 	Result: decouple both pairings and pair tent to tree
+		 * Case 6: ChosenCell is empty, and ChosenPairTree has no pairing
+		 * 	Result: place tent and pair with tree
+		 * Case 7: ChosenCell is empty, and ChosenPairTree has a pairing
+		 * 	Result: decouple paired tree's pairing and pair tent with pairtree
+		 * 
+		 *else, chosenPairTree is a non-tree so do one of the cases below
+		 * Case 8: ChosenCell is empty
+		 * 	Result: place tent with no pairing
+		 * Case 9: ChosenCell is a tent with no pairing
+		 * 	Result: remove tent
+		 * Case 10: ChosenCell is a tent with a pairing
+		 * 	Result: currently remove tent and it's pairing
+		 * */
+		if(chosenPairTree.isTree()) {
+			
 		}else {
-			chosenPairTree = availablePairings.get(chosenPairDecision);
-			if(this.treeTentMap.containsKey(chosenPairTree) && this.treeTentMap.get(chosenPairTree) != chosenCell) {
-				if(this.tentTreeMap.containsKey(chosenCell)) {
-					chosenPairTree = this.tentTreeMap.get(chosenCell);
-				} else {
-					chosenPairTree = null;
-				}
-			}
+			
 		}
 		int violationChange = calcViolationChange(chosenCell, chosenPairTree);
 		if(this.rand.nextDouble() < this.acceptanceProb(violationChange)) {
+			this.curViolationCount += violationChange;
 			this.adjustCell(chosenCell, chosenPairTree);
 		}
 	}
@@ -204,9 +217,6 @@ public class Solver {
 			this.curViolationCount += violationChange;
 			adjustCell(changeCell, tree);
 			this.availableCells.addAll(adjCells);
-		}
-		for (Cell cell: this.availableCells) {
-			cell.trimNonTrees();
 		}
 	}
 	
@@ -272,6 +282,11 @@ public class Solver {
 		}
 		
 		// FIXME:? May need to reset "fittness" (currentViolations)
+		
+	}
+	
+	//When done running, pairing in the maps should no longer exist
+	public void decouplePairing(Cell tent, Cell tree) {
 		
 	}
 
