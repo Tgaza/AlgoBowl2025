@@ -63,7 +63,8 @@ public class Verifier {
 				if (i != 1020) {
 				//			
 				try {
-					String outputFileName = "fileToBeVerified/output_from_991_to_"+i+".txt";
+//					String outputFileName = "fileToBeVerified/output_from_991_to_"+i+".txt";
+					String outputFileName = "officialOutputs/output_group"+i+"_attempt.txt";
 					String inputFileName = "officialInputs/input_group" + i + ".txt";
 					
 				
