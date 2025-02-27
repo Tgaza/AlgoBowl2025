@@ -22,6 +22,7 @@ public class Cell {
 
 	private ArrayList<Cell> diagAdjList;
 	private ArrayList<Cell> cardinalAdjList;
+	private ArrayList<Cell> treeAdjList;
 	
 	//this was added to track the tent(s) associated with tree(s) and vice versa
 	private ArrayList<Cell> pairedCells;
@@ -39,6 +40,7 @@ public class Cell {
 		this.isTent = false;
 		this.diagAdjList = new ArrayList<>();
 		this.cardinalAdjList = new ArrayList<>();
+		this.treeAdjList = new ArrayList<>();
 		this.pairedCells = new ArrayList<>();
 	}
 	
@@ -56,6 +58,14 @@ public class Cell {
 			if(this.cardinalAdjList.get(i).isTree()) {
 				this.cardinalAdjList.remove(i);
 				i--;
+			}
+		}
+	}
+	
+	public void updateTreeAdjList() {
+		for(int i = 0; i < this.cardinalAdjList.size(); i++) {
+			if(this.cardinalAdjList.get(i).isTree()) {
+				this.treeAdjList.add(this.cardinalAdjList.get(i));
 			}
 		}
 	}
@@ -116,5 +126,9 @@ public class Cell {
 
 	public char getSymbol() {
 		return this.symbol;
+	}
+
+	public ArrayList<Cell> getTreeAdjList() {
+		return treeAdjList;
 	}
 }
