@@ -55,6 +55,12 @@ public class Verifier {
 	
 	private int totalViolations = 0;
 	
+	//bad but it does work
+	public Set<Cell> tents = new HashSet<>();
+	public Set<Cell> trees = new HashSet<>();
+	public int numTents;
+	public int numTrees;
+	
 	public static void main(String[] args) {
 		//this is some temporary bull shit just to get the program to run with files plugged in manually
 		//replace with args[0] and args[1] later
@@ -109,10 +115,10 @@ public class Verifier {
 		//check how many violations there are in terms of pairing
 		int pairViolations = checkPairViolations();
 		
-		System.out.println(rowViolations);
-		System.out.println(columnViolations);
-		System.out.println(adjViolations);
-		System.out.println(pairViolations);
+//		System.out.println(rowViolations);
+//		System.out.println(columnViolations);
+//		System.out.println(adjViolations);
+//		System.out.println(pairViolations);
 		
 		return rowViolations + columnViolations + adjViolations + pairViolations;
 	}
@@ -185,8 +191,8 @@ public class Verifier {
 	private int checkColumnViolations() {
 		int violations = 0;
 		for(int c = 0; c < columns; c++) {
-			System.out.println("DesiredTentColCount: " + desiredTentColumnCount[c]);
-			System.out.println("TentColumnCount: " + tentColumnCount[c]);
+//			System.out.println("DesiredTentColCount: " + desiredTentColumnCount[c]);
+//			System.out.println("TentColumnCount: " + tentColumnCount[c]);
 			if(desiredTentColumnCount[c] != tentColumnCount[c]) {
 				violations = violations + Math.abs(desiredTentColumnCount[c] - tentColumnCount[c]);
 			}
