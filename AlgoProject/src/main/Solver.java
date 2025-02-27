@@ -8,6 +8,7 @@
 package main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,6 +21,8 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
+
+import java.util.Scanner;
 /**
  * -TODO: Create new Offical Folder to pull solutions/Inputfiles from 
  * -TODO: Ensure one indexed output !!!
@@ -104,84 +107,131 @@ public class Solver {
 		//			}
 		//			
 		//		}
-		//	
-		boolean runOfficials = false;
-		if (runOfficials) {
-			boolean continueRunning = true;
-			HashSet<Integer> improvedFiles = new HashSet<Integer>();
-			int[] filesToIgnore = { 1001, 1007, 1008, 1020 };
-			while (continueRunning) {
-				int filesImproved = 0;
-				for (int inputGroupNum = 963; inputGroupNum < 1025; inputGroupNum++) {
-					boolean ignoreFile = false;
-					for (int file : filesToIgnore) {
-						if (inputGroupNum == file) {
-							ignoreFile = true;
-						}
-					}
-					if (ignoreFile) {
-						continue;
-					}
-					String inputFileName = "input_group" + inputGroupNum + ".txt";
-					String inputFileFolder = "officialInputs";
-					String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-					String outputFileFolder = "officialOutputs";
-					String inputFile = inputFileFolder + "/" + inputFileName;
-					String outputFile = outputFileFolder + "/" + outputFileName;
-
+		//
+		
+		boolean runAllFiles = true;
+		if(runAllFiles) {
+			int groupToIgnore = 1020;
+			
+			for(int group = 974; group <=976; group++) {
+				if(group == groupToIgnore) {
+					continue;
+				}
+				String input = "officialInputs/input_group" + group + ".txt";
+				String output = "newBest/" + group + ".txt";
+				
+				//read the number of violations from our best
+				String baseOut = "data/BestSoFar/output_from_991_to_";
+				String end = ".txt";
+				String bestFile = baseOut + group + end;
+				int bestViolationCount;
+				try {
+			        Scanner scanner = new Scanner(new File(bestFile));
+			        bestViolationCount = scanner.nextInt();
+			        scanner.close();
+			    } catch (FileNotFoundException e) {
+			        System.err.println("Error: File not found - " + bestFile);
+			        return;
+			    }
+				
+				for(int annealRuns = 0; annealRuns < 5; annealRuns++) {
+					
+					
 					Solver solvee = new Solver();
-
-					solvee.readInput(inputFile);
+					solvee.readInput(input);
 					solvee.calcInitialViolationCount();
 					solvee.generateInitialSol();
-					solvee.solveWithIssues(inputFile, outputFile);
-
-					int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
-					if (solvee.getSolViolationCount() < previousViolationCount) {
-						solvee.outputToFile(outputFile);
-						System.out.println("solution " + inputGroupNum + " improved");
-						filesImproved++;
-						improvedFiles.add(inputGroupNum);
+					solvee.solveWithIssues(input, output);
+					
+					if(solvee.getSolViolationCount() < bestViolationCount) {
+						solvee.outputToFile(output);
+						bestViolationCount = solvee.getSolViolationCount();
+						System.out.println("Solution for group " + group + " input improved!");
 					} else {
-						System.out.println("solution not better than previous :( - " + solvee.getSolViolationCount());
+						System.out.println("Current best solution could not be improved...");
 					}
-
-					Verifier finalVerify = new Verifier(inputFile, outputFile);
 				}
-				//				if (filesImproved <= 5) {
-				continueRunning = false;
-				//				}
 			}
-			for (int file : improvedFiles) {
-				System.out.println("Improved File - " + file);
-			}
-		} else {
-			int inputGroupNum = 1005;
-			String inputFileName = "input_group" + inputGroupNum + ".txt";
-			String inputFileFolder = "officialInputs";
-			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-			String outputFileFolder = "testingOutputFiles";
-			String inputFile = inputFileFolder + "/" + inputFileName;
-			String outputFile = outputFileFolder + "/" + outputFileName;
-
-			Solver solvee = new Solver();
-
-			solvee.readInput(inputFile);
-			solvee.calcInitialViolationCount();
-			solvee.generateInitialSol();
-			solvee.solveWithIssues(inputFile, outputFile);
-
-			int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
-			if (solvee.getSolViolationCount() < previousViolationCount) {
-				solvee.outputToFile(outputFile);
-				System.out.println("solution " + inputGroupNum + " improved");
-			} else {
-				System.out.println("solution not better than previous :( - " + solvee.getSolViolationCount());
-			}
-
-			Verifier finalVerify = new Verifier(inputFile, outputFile);
-
 		}
+		
+		
+//		boolean runOfficials = false;
+//		if (runOfficials) {
+//			boolean continueRunning = true;
+//			HashSet<Integer> improvedFiles = new HashSet<Integer>();
+//			int[] filesToIgnore = { 1001, 1007, 1008, 1020 };
+//			while (continueRunning) {
+//				int filesImproved = 0;
+//				for (int inputGroupNum = 963; inputGroupNum < 1025; inputGroupNum++) {
+//					boolean ignoreFile = false;
+//					for (int file : filesToIgnore) {
+//						if (inputGroupNum == file) {
+//							ignoreFile = true;
+//						}
+//					}
+//					if (ignoreFile) {
+//						continue;
+//					}
+//					String inputFileName = "input_group" + inputGroupNum + ".txt";
+//					String inputFileFolder = "officialInputs";
+//					String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
+//					String outputFileFolder = "officialOutputs";
+//					String inputFile = inputFileFolder + "/" + inputFileName;
+//					String outputFile = outputFileFolder + "/" + outputFileName;
+//
+//					Solver solvee = new Solver();
+//
+//					solvee.readInput(inputFile);
+//					solvee.calcInitialViolationCount();
+//					solvee.generateInitialSol();
+//					solvee.solveWithIssues(inputFile, outputFile);
+//
+//					int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
+//					if (solvee.getSolViolationCount() < previousViolationCount) {
+//						solvee.outputToFile(outputFile);
+//						System.out.println("solution " + inputGroupNum + " improved");
+//						filesImproved++;
+//						improvedFiles.add(inputGroupNum);
+//					} else {
+//						System.out.println("solution not better than previous :( - " + solvee.getSolViolationCount());
+//					}
+//
+//					Verifier finalVerify = new Verifier(inputFile, outputFile);
+//				}
+//				//				if (filesImproved <= 5) {
+//				continueRunning = false;
+//				//				}
+//			}
+//			for (int file : improvedFiles) {
+//				System.out.println("Improved File - " + file);
+//			}
+//		} else {
+//			int inputGroupNum = 1019;
+//			String inputFileName = "input_group" + inputGroupNum + ".txt";
+//			String inputFileFolder = "officialInputs";
+//			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
+//			String outputFileFolder = "testingOutputFiles";
+//			String inputFile = inputFileFolder + "/" + inputFileName;
+//			String outputFile = outputFileFolder + "/" + outputFileName;
+//
+//			Solver solvee = new Solver();
+//
+//			solvee.readInput(inputFile);
+//			solvee.calcInitialViolationCount();
+//			solvee.generateInitialSol();
+//			solvee.solveWithIssues(inputFile, outputFile);
+//
+//			int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
+//			if (solvee.getSolViolationCount() < previousViolationCount) {
+//				solvee.outputToFile(outputFile);
+//				System.out.println("solution " + inputGroupNum + " improved");
+//			} else {
+//				System.out.println("solution not better than previous :( - " + solvee.getSolViolationCount());
+//			}
+//
+//			Verifier finalVerify = new Verifier(inputFile, outputFile);
+//
+//		}
 	}
 
 	public Solver() {
@@ -191,7 +241,7 @@ public class Solver {
 		this.colTents = null;
 		this.gameGrid = null;
 		this.temperature = 10;
-		this.coolingRate = 0.00001;
+		this.coolingRate = 0.0000001;
 		this.treeTentMap = new HashMap<Cell, Cell>();
 		this.tentTreeMap = new HashMap<Cell, Cell>();
 		this.availableCells = new ArrayList<Cell>();

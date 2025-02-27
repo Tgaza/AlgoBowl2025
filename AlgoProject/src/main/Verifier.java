@@ -56,7 +56,19 @@ public class Verifier {
 	public static void main(String[] args) {
 		//this is some temporary bull shit just to get the program to run with files plugged in manually
 		//replace with args[0] and args[1] later
-		new Verifier("officialInputs/input_group1001.txt", "officialOutputs/output_group1001_NullPntrException.txt");
+		
+		String baseInput = "officialInputs/input_group";
+		String baseOut = "BestSoFar/output_from_991_to_";
+		String end = ".txt";
+		
+		for(int i = 963; i <= 1024; i++) {
+			if(i != 1020) {
+				String num = String.valueOf(i);
+				String input = baseInput + num + end;
+				String output = baseOut + num + end;
+				new Verifier(input, output);
+			}
+		}
 	}
 	
 	//Main code for running the verifier
@@ -90,7 +102,7 @@ public class Verifier {
 //		System.out.println(columnViolations);
 //		System.out.println(adjViolations);
 //		System.out.println(pairViolations);
-		System.out.println(totalViolations);
+		System.out.println("Total Violations: " + totalViolations);
 		
 		if(totalViolations != claimedViolations) {
 			System.out.print("incorrect Violation count - ");
@@ -98,6 +110,8 @@ public class Verifier {
 		} else {
 			System.out.println("Valid Output File");
 		}
+		
+		System.out.println();
 		
 	}
 	
