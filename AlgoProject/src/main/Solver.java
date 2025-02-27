@@ -125,7 +125,7 @@ public class Solver {
 					String inputFileName = "input_group" + inputGroupNum + ".txt";
 					String inputFileFolder = "officialInputs";
 					String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-					String outputFileFolder = "testingOutputFiles";
+					String outputFileFolder = "officialOutputs";
 					String inputFile = inputFileFolder + "/" + inputFileName;
 					String outputFile = outputFileFolder + "/" + outputFileName;
 
@@ -156,7 +156,7 @@ public class Solver {
 				System.out.println("Improved File - " + file);
 			}
 		} else {
-			int inputGroupNum = 1011;
+			int inputGroupNum = 1005;
 			String inputFileName = "input_group" + inputGroupNum + ".txt";
 			String inputFileFolder = "officialInputs";
 			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
@@ -191,7 +191,7 @@ public class Solver {
 		this.colTents = null;
 		this.gameGrid = null;
 		this.temperature = 10;
-		this.coolingRate = 0.001;
+		this.coolingRate = 0.00001;
 		this.treeTentMap = new HashMap<Cell, Cell>();
 		this.tentTreeMap = new HashMap<Cell, Cell>();
 		this.availableCells = new ArrayList<Cell>();
@@ -256,7 +256,7 @@ public class Solver {
 		this.solViolationCount = this.curViolationCount;
 		this.solTentsPlaced = this.gameGrid.getTents().size();
 		this.updateSolutionPairings();
-		this.updateCurPairings();
+//		this.updateCurPairings();
 		while (this.temperature > 0) {
 			annealTrees();
 			if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
@@ -264,7 +264,7 @@ public class Solver {
 				this.solTentsPlaced = this.gameGrid.getTents().size();
 				this.updateSolutionPairings();
 			}
-			this.updateCurPairings();
+//			this.updateCurPairings();
 //			this.curOutputToFile(outputFile);
 //			this.printCurOutput();
 //			System.out.println();
@@ -276,8 +276,11 @@ public class Solver {
 			this.solTentsPlaced = this.gameGrid.getTents().size();
 			this.updateSolutionPairings();
 		}
+		this.updateCurPairings();
+		this.curOutputToFile(outputFile);
+		this.printCurOutput();
 		System.out.println("attempting to reload current solution");
-		this.printGrid();
+//		this.printGrid();
 		this.reloadSolution(inputFile);
 		this.printGrid();
 		ArrayList<Cell> availableCells2 = new ArrayList<Cell>();
@@ -293,6 +296,11 @@ public class Solver {
 		this.availableCells.clear();
 		this.availableCells = availableCells2;
 		this.temperature = initialTemp;
+		this.updateCurPairings();
+		this.curOutputToFile(outputFile);
+		this.printCurOutput();
+		System.out.println();
+		Verifier curVerify = new Verifier(inputFile, outputFile);
 		while (this.temperature > 0) {
 			annealRowsCols();
 			if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
@@ -300,11 +308,6 @@ public class Solver {
 				this.solTentsPlaced = this.gameGrid.getTents().size();
 				this.updateSolutionPairings();
 			}
-			this.updateCurPairings();
-			this.curOutputToFile(outputFile);
-			this.printCurOutput();
-			System.out.println();
-			Verifier curVerify = new Verifier(inputFile, outputFile);
 			this.temperature -= this.coolingRate;
 		}
 	}
@@ -361,7 +364,7 @@ public class Solver {
 		 * else it should be an empty cell, do cases below
 		 * 	add a tent
 		 * */
-		this.printGrid(chosenCell);
+//		this.printGrid(chosenCell);
 		int violationChange = calcViolationChangeRowsCols(chosenCell);
 		if (this.rand.nextDouble() < this.acceptanceProb(violationChange)) {
 			this.curViolationCount += violationChange;
@@ -907,6 +910,8 @@ public class Solver {
 			this.colTents = new int[this.cols];
 			this.curRowTents = new int[this.rows];
 			this.curColTents = new int[this.cols];
+			this.tentTreeMap.clear();
+			this.treeTentMap.clear();
 
 			for (int row = 0; row < this.rows; row++) {
 				this.rowTents[row] = sc.nextInt();
