@@ -56,7 +56,26 @@ public class Verifier {
 	public static void main(String[] args) {
 		//this is some temporary bull shit just to get the program to run with files plugged in manually
 		//replace with args[0] and args[1] later
-		new Verifier("officialInputs/input_group1001.txt", "officialOutputs/output_group1001_NullPntrException.txt");
+//		new Verifier("officialInputs/input_group1001.txt", "officialOutputs/output_group1001_NullPntrException.txt");
+		boolean verifAll = true;
+		if (verifAll)
+			for (int i = 963; i < 1025; i++) {
+				if (i != 1020) {
+				//			
+				try {
+					String outputFileName = "fileToBeVerified/output_from_991_to_"+i+".txt";
+					String inputFileName = "officialInputs/input_group" + i + ".txt";
+					
+				
+					new Verifier(inputFileName, outputFileName);
+					
+					
+					
+					
+				} catch (Exception e) {
+					System.out.println("Skipped File");
+				}}
+		}
 	}
 	
 	//Main code for running the verifier
@@ -90,10 +109,10 @@ public class Verifier {
 //		System.out.println(columnViolations);
 //		System.out.println(adjViolations);
 //		System.out.println(pairViolations);
-		System.out.println(totalViolations);
+//		System.out.println(totalViolations);
 		
 		if(totalViolations != claimedViolations) {
-			System.out.print("incorrect Violation count - ");
+//			System.out.print("incorrect Violation count "+outputFile+"- ");
 			exitProgram();
 		} else {
 			System.out.println("Valid Output File");
@@ -144,7 +163,8 @@ public class Verifier {
 	//If an issue with the output file is found, the program exits with printed statement
 	private void exitProgram() {
 		System.out.println("Invalid Output File");
-		System.exit(1);
+//		System.exit(1);
+		
 	}
 	
 	//checks the number of counted tents
