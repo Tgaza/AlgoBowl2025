@@ -467,7 +467,29 @@ public class Solver {
 			System.out.println();
 		}
 	}
-
+	
+	public void printGrid(Cell ProcessCell) {
+		System.out.println(this.rows + " " + this.cols);
+		System.out.println(this.curViolationCount);
+		System.out.println(this.gameGrid.getTents().size());
+		for (int row = 0; row < this.rows; row++) {
+			System.out.print(rowTents[row] + " ");
+		}
+		System.out.println();
+		for (int col = 0; col < this.cols; col++) {
+			System.out.print(colTents[col] + " ");
+		}
+		System.out.println();
+		// print out generated grid
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				String symbol = this.gameGrid.getCell(row, col).toString();
+				System.out.print(symbol);
+			}
+			System.out.println();
+		}
+	}
+	
 	public void printCurOutput() {
 		System.out.println(this.curViolationCount);
 		System.out.println(this.gameGrid.getTents().size());
