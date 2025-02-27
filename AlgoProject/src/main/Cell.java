@@ -59,15 +59,6 @@ public class Cell {
 			}
 		}
 	}
-	
-	public void trimNonTrees() {
-		for(int i = 0; i < this.cardinalAdjList.size(); i++) {
-			if(!this.cardinalAdjList.get(i).isTree()) {
-				this.cardinalAdjList.remove(i);
-				i--;
-			}
-		}
-	}
 
 	public void updateDiagAdjList(Cell adjCell) {
 		this.diagAdjList.add(adjCell);
