@@ -75,57 +75,55 @@ public class Solver {
 
 	public static void main(String[] args) {
 
-//		String inputFileFolder = "AlgoBowl/testingInputs";
-//		String outputFileFolder = "AlgoBowl/testingOutputFiles";
-		
-		
-		
-//	
-//		for (int i = 963; i < 1025; i++) {
-//			
-//			try {
-//				String inputFileName = "input_group" + i + ".txt";
-//				String outputFileName = inputFileFolder.replace(".txt", "_Solved.txt");
-//
-//				String inputFile = inputFileFolder + "/" + inputFileName;
-//				String outputFile = outputFileFolder + "/" + outputFileName;
-//
-//				//Solver solvee = new Solver();
-//				//solvee.readInput(inputFile);
-//				//solvee.calcInitialViolationCount();
-//				//solvee.generateInitialSol();
-//				//solvee.printGrid();
-//				//solvee.curOutputToFile(outputFile);
-//				//				
-//				//Verifier very = new Verifier(inputFile, outputFile);
-//
-//				System.out.println("Processed File: " + inputFile + " -> " + outputFile);
-//			} catch (Exception e) {
-//				System.out.println("Skipped File");
-//			}
-//			
-//		}
-//	
-			
-			int inputGroupNum = 1001;
-			String inputFileName = "input_group" + 1001 + ".txt";
-			String inputFileFolder = "officialInputs";
-			String outputFileName = "output_group" + 1001 + "_attempt_1.txt";
-			String outputFileFolder = "testingOutputFiles";
-			String inputFile = inputFileFolder + "/" + inputFileName;
-			String outputFile = outputFileFolder + "/" + outputFileName;
-			
-			Solver solvee = new Solver();
-			
-			solvee.readInput(inputFile);
-			solvee.calcInitialViolationCount();
-			solvee.generateInitialSol();
-			//solvee.printGrid();
-			solvee.solve();
-			solvee.outputToFile(outputFile);
-			
-			Verifier very = new Verifier(inputFile, outputFile);
-		}
+		//		String inputFileFolder = "AlgoBowl/testingInputs";
+		//		String outputFileFolder = "AlgoBowl/testingOutputFiles";
+
+		//	
+		//		for (int i = 963; i < 1025; i++) {
+		//			
+		//			try {
+		//				String inputFileName = "input_group" + i + ".txt";
+		//				String outputFileName = inputFileFolder.replace(".txt", "_Solved.txt");
+		//
+		//				String inputFile = inputFileFolder + "/" + inputFileName;
+		//				String outputFile = outputFileFolder + "/" + outputFileName;
+		//
+		//				//Solver solvee = new Solver();
+		//				//solvee.readInput(inputFile);
+		//				//solvee.calcInitialViolationCount();
+		//				//solvee.generateInitialSol();
+		//				//solvee.printGrid();
+		//				//solvee.curOutputToFile(outputFile);
+		//				//				
+		//				//Verifier very = new Verifier(inputFile, outputFile);
+		//
+		//				System.out.println("Processed File: " + inputFile + " -> " + outputFile);
+		//			} catch (Exception e) {
+		//				System.out.println("Skipped File");
+		//			}
+		//			
+		//		}
+		//	
+
+		int inputGroupNum = 1001;
+		String inputFileName = "input_group" + 1001 + ".txt";
+		String inputFileFolder = "officialInputs";
+		String outputFileName = "output_group" + 1001 + "_attempt_1.txt";
+		String outputFileFolder = "testingOutputFiles";
+		String inputFile = inputFileFolder + "/" + inputFileName;
+		String outputFile = outputFileFolder + "/" + outputFileName;
+
+		Solver solvee = new Solver();
+
+		solvee.readInput(inputFile);
+		solvee.calcInitialViolationCount();
+		solvee.generateInitialSol();
+		//solvee.printGrid();
+		solvee.solve();
+		solvee.outputToFile(outputFile);
+
+		Verifier very = new Verifier(inputFile, outputFile);
+	}
 
 	public Solver() {
 		this.rows = -1;
@@ -263,8 +261,6 @@ public class Solver {
 	/*
 	 * Updates cell to go from empty to tent and vice versa, and updates adj tree to be pair and vice versa
 	 * 
-<<<<<<< HEAD
-	 *if chosenPairTree is a tree, then do one of the cases below
 	 * Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing
 	 * 	Result: pair the two together
 	 * Case 2: ChosenCell is empty, and ChosenPairTree has no pairing
@@ -279,23 +275,6 @@ public class Solver {
 	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
 	 * Case 7: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other
 	 * 	Result: decouple both pairings and pair tent to tree
-=======
-	 * Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing
-	 * 	Result: pair the two together
-	 * Case 2: ChosenCell is a tent with a pairing, and ChosenPairTree has no pairing
-	 * 	Result: remove original pairing of ChosenCell and replace with a pairing with ChosenPairTree
-	 * Case 4: ChosenCell is a tent paired with ChosenPairTree
-	 * 	Result: remove tent and unpair
-	 * 
-	 * 
-	 * Case 3: ChosenCell is a tent with no pairing, and ChosenPairTree has a pairing
-	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
-	 * Case 5: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other
-	 * 	Result: decouple both pairings and pair tent to tree
-	 * Case 6: ChosenCell is empty, and ChosenPairTree has no pairing
-	 * 	Result: place tent and pair with tree
-	 * Case 7: ChosenCell is empty, and ChosenPairTree has a pairing
-	 * 	Result: decouple paired tree's pairing and pair tent with pairtree
 	 * 
 	 * 
 	 *else, chosenPairTree is a non-tree so do one of the cases below
@@ -308,63 +287,50 @@ public class Solver {
 	 */
 	public void adjustCell(Cell changeCell, Cell pairTree) {
 		// Case 8 9 10 // Chnage Cell is Not a Tree
-		if ( (pairTree != null) && (!pairTree.isTree()) ) {
+		if ((pairTree != null) && (!pairTree.isTree())) {
 			// Case 8: Chosen Cell is empty -> Put Tent
 			if (changeCell.getSymbol() == '.') {
 				this.gameGrid.updateCell(changeCell, '^');
-			}
-			else if (changeCell.getSymbol() == '^'){ // We must be a tent
-				 // Case 9,10
+				this.curRowTents[changeCell.getRow()]--;
+				this.curColTents[changeCell.getCol()]--;
+			} else if (changeCell.getSymbol() == '^') { // We must be a tent
+				// Case 9,10
 				decouplePairings(changeCell, tentTreeMap.get(changeCell));
 				this.gameGrid.updateCell(changeCell, '.');
+				this.curRowTents[changeCell.getRow()]++;
+				this.curColTents[changeCell.getCol()]++;
 			}
 			return;
 		}
-		// Case 1 and 3 // Tent no Tree pairs
-		if ( changeCell.getSymbol() == '^'){
-			if(!tentTreeMap.containsKey(changeCell)) {
-				if (pairTree != null) { // Gotta check to make sure that this jaunt aint null yeerd 
-					// Case 3,1 //
-					if(treeTentMap.containsKey(pairTree)) { // FIXME: HEY I FUCKED THIS BIGTIME
-						decouplePairings(changeCell, tentTreeMap.get(changeCell));
-						Cell oldTent = treeTentMap.get(pairTree);
-						tentTreeMap.remove(oldTent);
-						this.gameGrid.updateCell(oldTent, '.');
-					}
-					this.treeTentMap.put(pairTree, changeCell);
-					this.tentTreeMap.put(changeCell, pairTree);
-				}
+
+		if ((pairTree != null) && (pairTree.isTree()) && changeCell.isTent()) {
+			if (this.tentTreeMap.get(changeCell) == pairTree) {// Case 3
+				this.decouplePairings(changeCell, pairTree);
+				this.gameGrid.updateCell(changeCell, '.');
+				this.curRowTents[changeCell.getRow()]++;
+				this.curColTents[changeCell.getCol()]++;
+			} else {// Cases 1/4/5/7
+				this.decouplePairings(changeCell, pairTree);
+				this.tentTreeMap.put(changeCell, pairTree);
+				this.treeTentMap.put(pairTree, changeCell);
 			}
-			else {
-				Cell oldPairTree = tentTreeMap.get(changeCell);
-				
-				if(pairTree == oldPairTree) { // Case 4
-					decouplePairings(pairTree, oldPairTree);
-					this.gameGrid.updateCell(changeCell, '.');
-				}
-				
-				else { // Case 2, 5
-					decouplePairings(pairTree, oldPairTree);
-					if (pairTree != null) {
-						if (treeTentMap.containsKey(pairTree)) {
-							decouplePairings(pairTree, null); // FIXME: HEY I FUCKED THIS TOO
-							this.gameGrid.updateCell(changeCell, '.');
-						}
-					}	
-					this.treeTentMap.put(pairTree, changeCell);
-					this.tentTreeMap.put(changeCell, pairTree);
-				}
-			}
+		} else { //Cases 2/6
+			this.decouplePairings(changeCell, pairTree);
+			this.gameGrid.updateCell(changeCell, '^');
+			this.tentTreeMap.put(changeCell, pairTree);
+			this.treeTentMap.put(pairTree, changeCell);
+			this.curRowTents[changeCell.getRow()]--;
+			this.curColTents[changeCell.getCol()]--;
 		}
-				
+
 	}
-	
+
 	//When done running, pairing in the maps should no longer exist, neither 
 	public void decouplePairings(Cell tent, Cell tree) {
-		if(this.tentTreeMap.containsKey(tent)) {
+		if (this.tentTreeMap.containsKey(tent)) {
 			this.treeTentMap.remove(this.tentTreeMap.get(tent));
 		}
-		if(this.treeTentMap.containsKey(tree)) {
+		if (this.treeTentMap.containsKey(tree)) {
 			this.tentTreeMap.remove(this.treeTentMap.get(tree));
 		}
 		this.tentTreeMap.remove(tent);
@@ -402,10 +368,10 @@ public class Solver {
 		int row = changeCell.getRow();
 		int col = changeCell.getCol();
 		//Check if the cell to change is an empty cell
-		if(pairTree != null && pairTree.isTree()) {
-			if(this.tentTreeMap.get(changeCell) == pairTree) {// Case 3
-//				 * Case 3: ChosenCell is a tent paired with ChosenPairTree
-//				 * 	Result: remove tent and unpair
+		if (pairTree != null && pairTree.isTree()) {
+			if (this.tentTreeMap.get(changeCell) == pairTree) {// Case 3
+				//				 * Case 3: ChosenCell is a tent paired with ChosenPairTree
+				//				 * 	Result: remove tent and unpair
 				violationChange += (Math.abs(this.curRowTents[row] + 1) - Math.abs(this.curRowTents[row]));//update Violations from rowCount
 				violationChange += (Math.abs(this.curColTents[col] + 1) - Math.abs(this.curColTents[col]));//update Violations from colCount
 				violationChange++;
@@ -413,15 +379,19 @@ public class Solver {
 					violationChange--;
 					violationChange -= this.gameGrid.checkAdjAliens(changeCell, true);
 				}
-			}else if(this.tentTreeMap.containsKey(changeCell) || this.treeTentMap.containsKey(pairTree)) {// Cases 4/5/6/7
-//				 * Case 4: ChosenCell is a tent with a pairing, and ChosenPairTree has no pairing, no violation count change
-//				 * Case 5: ChosenCell is a tent with no pairing, and ChosenPairTree has a pairing, no violation count change
-//				 * Case 6: ChosenCell is empty, and ChosenPairTree has a pairing, multiple changes
-//		 		 * Case 7: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other, multiple changes
-//				 * 	Result: decouple pairings and pair tent to tree
-				if(this.tentTreeMap.containsKey(changeCell) && this.treeTentMap.containsKey(pairTree)) {
-					violationChange += 2;
-				}else if(!changeCell.isTent()){
+			} else if (this.tentTreeMap.containsKey(changeCell) || this.treeTentMap.containsKey(pairTree)) {// Cases 4/5/6/7
+				//				 * Case 4: ChosenCell is a tent with a pairing, and ChosenPairTree has no pairing, +1
+				//				 * Case 5: ChosenCell is a tent with no pairing, and ChosenPairTree has a pairing, +1
+				//				 * Case 6: ChosenCell is empty, and ChosenPairTree has a pairing, multiple changes
+				//		 		 * Case 7: ChosenCell is a tent with a pairing, and ChosenPairTree has a pairing, not with each other, multiple changes
+				//				 * 	Result: decouple pairings and pair tent to tree
+				if(this.tentTreeMap.containsKey(changeCell)) {
+					violationChange++;
+				}
+				if(this.treeTentMap.containsKey(pairTree)){
+					violationChange++;
+				}
+				if (!changeCell.isTent()) {
 					violationChange += (Math.abs(this.curRowTents[row] - 1) - Math.abs(this.curRowTents[row]));//update Violations from rowCount
 					violationChange += (Math.abs(this.curColTents[col] - 1) - Math.abs(this.curColTents[col]));//update Violations from colCount
 					if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent, either case
@@ -429,13 +399,14 @@ public class Solver {
 						violationChange += this.gameGrid.checkAdjAliens(changeCell, false);
 					}
 				}
-			}else if(changeCell.isTent()) {// Case 1
-//				* Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing, -1 violation
-//				 * 	Result: pair the two together
+			} else if (changeCell.isTent()) {// Case 1
+				//				* Case 1: ChosenCell is a tent with no pairing, and ChosenPairTree has no pairing, -1 violation
+				//				 * 	Result: pair the two together
 				violationChange--;
-			}else {//Case 2
-//				 * Case 2: ChosenCell is empty, and ChosenPairTree has no pairing, multipleChanges
-//				 * 	Result: place tent and pair with tree
+				violationChange--;
+			} else {//Case 2
+				//				 * Case 2: ChosenCell is empty, and ChosenPairTree has no pairing, multipleChanges
+				//				 * 	Result: place tent and pair with tree
 				violationChange += (Math.abs(this.curRowTents[row] - 1) - Math.abs(this.curRowTents[row]));//update Violations from rowCount
 				violationChange += (Math.abs(this.curColTents[col] - 1) - Math.abs(this.curColTents[col]));//update Violations from colCount
 				if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent
@@ -444,25 +415,28 @@ public class Solver {
 				}
 				violationChange--; //pair with tree
 			}
-		}else {
-			if(changeCell.isTent()) {//Cases 9/10
-//			     * Case 9: ChosenCell is a tent with no pairing, multiple changes
-//				 * Case 10: ChosenCell is a tent with a pairing, multiple changes
-//				 * 	Result: decouple and remove tent
+		} else {
+			if (changeCell.isTent()) {//Cases 9/10
+				//			     * Case 9: ChosenCell is a tent with no pairing, multiple changes
+				//				 * Case 10: ChosenCell is a tent with a pairing, multiple changes
+				//				 * 	Result: decouple and remove tent
 				violationChange += (Math.abs(this.curRowTents[row] + 1) - Math.abs(this.curRowTents[row]));//update Violations from rowCount
 				violationChange += (Math.abs(this.curColTents[col] + 1) - Math.abs(this.curColTents[col]));//update Violations from colCount
 				if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent
 					violationChange--;
 					violationChange -= this.gameGrid.checkAdjAliens(changeCell, true);
 				}
-				if(this.tentTreeMap.containsKey(changeCell)) {
+				if (this.tentTreeMap.containsKey(changeCell)) {
 					violationChange++;
+				}else {
+					violationChange--;
 				}
-			}else {// Case 8
-//				 * Case 8: ChosenCell is empty, multiple changes
-//				 * 	Result: place tent with no pairing
+			} else {// Case 8
+				//				 * Case 8: ChosenCell is empty, multiple changes
+				//				 * 	Result: place tent with no pairing
 				violationChange += (Math.abs(this.curRowTents[row] - 1) - Math.abs(this.curRowTents[row]));//update Violations from rowCount
 				violationChange += (Math.abs(this.curColTents[col] - 1) - Math.abs(this.curColTents[col]));//update Violations from colCount
+				violationChange++;
 				if (this.gameGrid.isAdjTent(changeCell)) {//check if there is at least one adj tent
 					violationChange++;
 					violationChange += this.gameGrid.checkAdjAliens(changeCell, false);
