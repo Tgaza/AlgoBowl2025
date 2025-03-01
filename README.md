@@ -1,5 +1,5 @@
 ## TEMPORARY README
-## ALGO BOWL S25- "Teamname" 
+## ALGO BOWL S25- "NullPntrException" 
 ### Ty Gazaway, Thomas Dowd, John Silva
 
 <br>
