@@ -24,7 +24,7 @@ public class Cell {
 	private ArrayList<Cell> cardinalAdjList;
 	
 	//this was added to track the tent(s) associated with tree(s) and vice versa
-	private List<Cell> pairedCells;
+	private ArrayList<Cell> pairedCells;
 	
 	/**
 	 * Constructor
@@ -50,16 +50,25 @@ public class Cell {
 	public void updateCardinalAdjList(Cell adjCell) {
 		this.cardinalAdjList.add(adjCell);
 	}
+	
+	public void trimTrees() {
+		for(int i = 0; i < this.cardinalAdjList.size(); i++) {
+			if(this.cardinalAdjList.get(i).isTree()) {
+				this.cardinalAdjList.remove(i);
+				i--;
+			}
+		}
+	}
 
 	public void updateDiagAdjList(Cell adjCell) {
 		this.diagAdjList.add(adjCell);
 	}
 
-	public List<Cell> getDiagAdjList() {
+	public ArrayList<Cell> getDiagAdjList() {
 		return this.diagAdjList;
 	}
 
-	public List<Cell> getCardinalAdjList() {
+	public ArrayList<Cell> getCardinalAdjList() {
 		return this.cardinalAdjList;
 	}
 	
@@ -67,7 +76,7 @@ public class Cell {
 		this.pairedCells.add(pairCell);
 	}
 	
-	public List<Cell> getPairedCells() {
+	public ArrayList<Cell> getPairedCells() {
 		return this.pairedCells;
 	}
 

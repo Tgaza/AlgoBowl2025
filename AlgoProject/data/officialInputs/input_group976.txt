@@ -1,0 +1,10 @@
+7 18
+18 4 6 6 6 0 6
+7 2 4 2 2 3 3 3 4 1 1 4 2 2 3 3 2 0
+T...T..TT...T.T..T
+..T..T...T..TTT...
+TT.TT...T..T.TT..T
+.T...TT..TT...T..T
+T.T.T.T..T...TT..T
+..TT...T.T.T...T..
+TT.TTTT..TTTTT.TT.

@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * 2D Game Board.<br>
  * 
@@ -70,7 +69,7 @@ public class GameGrid {
 		List<Cell> targets = new ArrayList<>();
 		for (Cell cardinalCell : tree.getCardinalAdjList()) {
 			validCell = true;
-			if (!cardinalCell.isTent()){
+			if (!cardinalCell.isTent()) {
 				for (Cell adjCell : cardinalCell.getCardinalAdjList()) {
 					if (adjCell.isTent()) {
 						validCell = false;
@@ -91,7 +90,73 @@ public class GameGrid {
 		return targets;
 	}
 
+	public int checkAdjAliens(Cell origCell, boolean removing) {
+		int alienCount = 0;
+		if(removing) {
+			this.updateCell(origCell, '.');
+		}
+		for (Cell adjCell : origCell.getCardinalAdjList()) {
+			if (adjCell.isTent() && !this.isAdjTent(adjCell)) {
+				alienCount++;
+			}
+		}
+		for (Cell adjCell : origCell.getDiagAdjList()) {
+			if (adjCell.isTent() && !this.isAdjTent(adjCell)) {
+				alienCount++;
+			}
+		}
+		if(removing) {
+			this.updateCell(origCell, '^');
+		}
+		return alienCount;
+	}
+
+	//Checks for an adjTent
+	public boolean isAdjTent(Cell cell) {
+		boolean adjTent = false;
+		for (Cell adjCell : cell.getCardinalAdjList()) {
+			if (adjCell.isTent()) {
+				adjTent = true;
+				break;
+			}
+		}
+		for (Cell adjCell : cell.getDiagAdjList()) {
+			if (adjCell.isTent()) {
+				adjTent = true;
+				break;
+			}
+		}
+		return adjTent;
+	}
+
 	public void updateCell(Cell cell, char symbol) {
+		switch (symbol) {
+		case '.':
+			if (cell.isTree()) {
+				this.trees.remove(cell);
+			} else if (cell.isTent()) {
+				this.tents.remove(cell);
+			}
+			break;
+		case 'T':
+			if (cell.isTent()) {
+				this.tents.remove(cell);
+			}
+			this.trees.add(cell);
+			break;
+		case '^':
+			if (cell.isTree()) {
+				this.trees.remove(cell);
+			}
+			this.tents.add(cell);
+			break;
+		}
+		cell.setSymbol(symbol);
+	}
+
+	//overload of update cell to allow row and col input
+	public void updateCell(int row, int col, char symbol) {
+		Cell cell = this.grid[row][col];
 		switch (symbol) {
 		case '.':
 			if (cell.isTree()) {
