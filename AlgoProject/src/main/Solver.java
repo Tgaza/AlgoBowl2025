@@ -1,5 +1,14 @@
 /**
  * "NullPntrException"
+ * Solver for the Tents and Trees problem for Spring 2025: AlgoBowl
+ * 
+ * The puzzle game Tents and Trees is played on a 2-D grid, such that each cell may contain a tent, a tree, or it may be blank.
+ *	1. No two tents are adjacent, even diagonally.
+ *	2. Each row and column has the correct number of tents, as indicated by numbers marked outside the row or
+ *		column.
+ *	3. Each tent has its own tree, either horizontally or vertically adjacent.
+ * Inputs may not be fully solvable and this class minimizes the number of violations.
+ * 
  * @author Ty Gazaway
  * @author John Silva 
  * @author Thomas Dowd
@@ -8,44 +17,47 @@
 package main;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Set;
 
+// Time Spend Debugging CalcViolationChange: 9 Hours
 
-import java.util.Scanner;
 /**
- * -TODO: Create new Offical Folder to pull solutions/Inputfiles from 
- * -TODO: Ensure one indexed output !!!
  * 
- * VVV Output requirments VVV 
- * -TODO: Incorect num of violations <- INVALID
- * -TODO: Tent Superposition (Tent cannot overlap with existing entity)<-INVALID 
- * -TODO: Cant Fall off edge of world <- INVALID 
- * -TODO: Tent cannot be paired with non-tree entity <-INVALID 
- * -TODO: File must have proper formatting + No missing/corrupt data <- INVALID
+ * Tents And Tree's Simulated Annealing.<br> 
+ * The present best solutions are kept Official Inputs/Output. Uses Simulated Annealing to solve this problem. <br>
+ * <i>NOTE:</i> Not all functions are useful, methods marked with Misc, Utilities, or Testing are not ensured to be viable or safe.<br>
  * 
  * 
- * -TODO: Cant be an unpaired entity <- Violation
- * -TODO: Multiple adjenecies != multiple violations (Specifially with Tents) <- Violation 
- * -TODO: A row or column which has too many or too few tents causes multiple violations: one
- * violation for each tent to many or too few<- Violation
+ * <br> VVV Output requirements VVV <br>
+ * <br>~Incorect num of violations <- <i> INVALID </i> 
+ * <br>~Tent Superposition (Tent cannot overlap with existing entity)<- <i> INVALID</i> 
+ * <br>~Cant Fall off edge of world <- <i>INVALID</i> 
+ * <br>~Tent cannot be paired with non-tree entity <-<i>INVALID</i> 
+ * <br>~File must have proper formatting + No missing/corrupt data <- <i>INVALID</i>
+ * <br>~Cant be an unpaired entity <- Violation
+ * <br>~Multiple adjenecies != multiple violations (Specifially with Tents) <- Violation 
+ * <br>~A row or column which has too many or too few tents causes multiple violations: one
+ * <br>~violation for each tent to many or too few<- Violation
  * 
- * VVV Solving ideas/methods VVV
- * MUST BE 1 Indexed;
- * (ROW,COL)
- * When complete, "todo" -> "fixme"
+ *<br> <br> VVV Solving ideas/methods VVV <br>
+ * MUST BE 1 Indexed; <br>
+ * (ROW,COL) <br>
+ * When complete, "todo" -> "fixme" <br>
+ * 
+ * <br> VVV References: VVV
+ * <br>CSCI_404_2018 Lecture number 9 and 10
+ * <br>Noureddin Sadawi's youtube playlist for Simmulated Annealing
  */
 public class Solver {
+	
+	// ~ ~ ~ Class Attributes ~ ~ ~ //
 
 	// Grid attributes
 	private int rows;
@@ -77,43 +89,18 @@ public class Solver {
 	private Random rand = new Random();
 	private String[] curPairings; // tent to tree
 
+	// ~ ~ ~ Main ~ ~ ~ //
 	public static void main(String[] args) {
-
-		//		String inputFileFolder = "AlgoBowl/testingInputs";
-		//		String outputFileFolder = "AlgoBowl/testingOutputFiles";
-
-		//	
-		//		for (int i = 963; i < 1025; i++) {
-		//			
-		//			try {
-		//				String inputFileName = "input_group" + i + ".txt";
-		//				String outputFileName = inputFileFolder.replace(".txt", "_Solved.txt");
-		//
-		//				String inputFile = inputFileFolder + "/" + inputFileName;
-		//				String outputFile = outputFileFolder + "/" + outputFileName;
-		//
-		//				//Solver solvee = new Solver();
-		//				//solvee.readInput(inputFile);
-		//				//solvee.calcInitialViolationCount();
-		//				//solvee.generateInitialSol();
-		//				//solvee.printGrid();
-		//				//solvee.curOutputToFile(outputFile);
-		//				//				
-		//				//Verifier very = new Verifier(inputFile, outputFile);
-		//
-		//				System.out.println("Processed File: " + inputFile + " -> " + outputFile);
-		//			} catch (Exception e) {
-		//				System.out.println("Skipped File");
-		//			}
-		//			
-		//		}
-		//	
-		boolean runOfficials = false;
+		
+		boolean runOfficials = false; // True -> Run all
+		
+		// Run many files at once
 		if (runOfficials) {
 			boolean continueRunning = true;
 			HashSet<Integer> improvedFiles = new HashSet<Integer>();
-			int[] filesToIgnore = {973, 975, 976, 989, 998, 1001, 1004, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1014, 1015, 1020 };
-			while (continueRunning) {
+			int[] filesToIgnore = { // Add all files to ignore here //
+					973, 975, 976, 989, 998, 1001, 1004, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1014, 1015, 1020};
+			while (continueRunning) { 
 				int filesImproved = 0;
 				for (int inputGroupNum = 963; inputGroupNum < 1025; inputGroupNum++) {
 					boolean ignoreFile = false;
@@ -135,8 +122,6 @@ public class Solver {
 					Solver solvee = new Solver();
 					solvee.readInput(inputFile);
 					solvee.calcInitialViolationCount();
-					//					solvee.generateInitialSol();
-					//					solvee.solveWithIssues(inputFile, outputFile);
 					solvee.generateInitialSolFull();
 					solvee.solveFull(inputFile, outputFile);
 
@@ -157,8 +142,12 @@ public class Solver {
 			for (int file : improvedFiles) {
 				System.out.println("Improved File - " + file);
 			}
-		} else {
-			int inputGroupNum = 1019;
+		} 
+		
+		// For running a single files at a time
+		else { 
+			int inputGroupNum = 991; // CHANGE HERE, to group number of choice
+			
 			String inputFileName = "input_group" + inputGroupNum + ".txt";
 			String inputFileFolder = "officialInputs";
 			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
@@ -167,11 +156,9 @@ public class Solver {
 			String outputFile = outputFileFolder + "/" + outputFileName;
 
 			Solver solvee = new Solver();
-
+			
 			solvee.readInput(inputFile);
 			solvee.calcInitialViolationCount();
-			//			solvee.generateInitialSol();
-			//			solvee.solveWithIssues(inputFile, outputFile);
 			solvee.generateInitialSolFull();
 			solvee.solveFull(inputFile, outputFile);
 
@@ -183,98 +170,31 @@ public class Solver {
 				System.out.println("solution not better than previous :( - " + solvee.getSolViolationCount());
 			}
 
+			@SuppressWarnings("unused")
 			Verifier finalVerify = new Verifier(inputFile, outputFile);
 			System.out.println(" ~ ~ ~ Simulation Complete ~ ~ ~ ");
 		}
 		
-		
-//		boolean runOfficials = false;
-//		if (runOfficials) {
-//			boolean continueRunning = true;
-//			HashSet<Integer> improvedFiles = new HashSet<Integer>();
-//			int[] filesToIgnore = { 1001, 1007, 1008, 1020 };
-//			while (continueRunning) {
-//				int filesImproved = 0;
-//				for (int inputGroupNum = 963; inputGroupNum < 1025; inputGroupNum++) {
-//					boolean ignoreFile = false;
-//					for (int file : filesToIgnore) {
-//						if (inputGroupNum == file) {
-//							ignoreFile = true;
-//						}
-//					}
-//					if (ignoreFile) {
-//						continue;
-//					}
-//					String inputFileName = "input_group" + inputGroupNum + ".txt";
-//					String inputFileFolder = "officialInputs";
-//					String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-//					String outputFileFolder = "officialOutputs";
-//					String inputFile = inputFileFolder + "/" + inputFileName;
-//					String outputFile = outputFileFolder + "/" + outputFileName;
-//
-//					Solver solvee = new Solver();
-//
-//					solvee.readInput(inputFile);
-//					solvee.calcInitialViolationCount();
-//					solvee.generateInitialSol();
-//					solvee.solveWithIssues(inputFile, outputFile);
-//
-//					int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
-//					if (solvee.getSolViolationCount() < previousViolationCount) {
-//						solvee.outputToFile(outputFile);
-//						System.out.println("solution " + inputGroupNum + " improved");
-//						filesImproved++;
-//						improvedFiles.add(inputGroupNum);
-//					} else {
-//						System.out.println("solution not better than previous :( - " + solvee.getSolViolationCount());
-//					}
-//
-//					Verifier finalVerify = new Verifier(inputFile, outputFile);
-//				}
-//				//				if (filesImproved <= 5) {
-//				continueRunning = false;
-//				//				}
-//			}
-//			for (int file : improvedFiles) {
-//				System.out.println("Improved File - " + file);
-//			}
-//		} else {
-//			int inputGroupNum = 1019;
-//			String inputFileName = "input_group" + inputGroupNum + ".txt";
-//			String inputFileFolder = "officialInputs";
-//			String outputFileName = "output_group" + inputGroupNum + "_attempt.txt";
-//			String outputFileFolder = "testingOutputFiles";
-//			String inputFile = inputFileFolder + "/" + inputFileName;
-//			String outputFile = outputFileFolder + "/" + outputFileName;
-//
-//			Solver solvee = new Solver();
-//
-//			solvee.readInput(inputFile);
-//			solvee.calcInitialViolationCount();
-//			solvee.generateInitialSol();
-//			solvee.solveWithIssues(inputFile, outputFile);
-//
-//			int previousViolationCount = solvee.retrievePreviousViolationCount(outputFile);
-//			if (solvee.getSolViolationCount() < previousViolationCount) {
-//				solvee.outputToFile(outputFile);
-//				System.out.println("solution " + inputGroupNum + " improved");
-//			} else {
-//				System.out.println("solution not better than previous :( - " + solvee.getSolViolationCount());
-//			}
-//
-//			Verifier finalVerify = new Verifier(inputFile, outputFile);
-//
-//		}
 	}
-
+	/**
+	 * 
+	 * Adjustable Parameters:<br>
+	 * ~ {@link #temperature} to determine the temperature of the simulation <br>
+	 * ~ {@link #coolingRate} to adjust the number of iterations of the simulation <br>
+	 * 
+	 * <i>NOTE:</i> This class is not optimized to run quickly, be patient while running. Exiting while this function is running could lead to undefined behavior
+	 */
 	public Solver() {
+		// Adjustable Parameters
+		this.temperature = 10;		   // ADJUST TEMP
+		this.coolingRate = 0.00000001; // ADJUST RATE
+		
+		// Non-Adjustable Parameters
 		this.rows = -1;
 		this.cols = -1;
 		this.rowTents = null;
 		this.colTents = null;
 		this.gameGrid = null;
-		this.temperature = 10;
-		this.coolingRate = 0.00000001;
 		this.treeTentMap = new HashMap<Cell, Cell>();
 		this.tentTreeMap = new HashMap<Cell, Cell>();
 		this.availableCells = new ArrayList<Cell>();
@@ -288,113 +208,14 @@ public class Solver {
 
 	}
 
-	//solve methods
-
-	public void solve(String inputFile) {
-		double initialTemp = this.temperature;
-		this.solViolationCount = this.curViolationCount;
-		this.solTentsPlaced = this.gameGrid.getTents().size();
-		this.updateSolutionPairings();
-		while (this.temperature > 0) {
-			annealTrees();
-			if (this.curViolationCount < this.solViolationCount || solViolationCount == -1) {
-				solViolationCount = curViolationCount;
-				solTentsPlaced = this.gameGrid.getTents().size();
-				this.updateSolutionPairings();
-			}
-			this.temperature -= this.coolingRate;
-		}
-		if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
-			this.solViolationCount = this.curViolationCount;
-			this.solTentsPlaced = this.gameGrid.getTents().size();
-			this.updateSolutionPairings();
-		}
-		System.out.println("attempting to reload current solution");
-		this.reloadSolution(inputFile);
-		ArrayList<Cell> availableCells2 = new ArrayList<Cell>();
-		for (int row = 0; row < this.rows; row++) {
-			for (int col = 0; col < this.cols; col++) {
-				availableCells2.add(this.gameGrid.getCell(row, col));
-			}
-		}
-		availableCells2.removeAll(this.availableCells);
-		availableCells2.removeAll(this.gameGrid.getTrees());
-		this.availableCells.clear();
-		this.availableCells = new ArrayList<Cell>(availableCells2);
-		this.temperature = initialTemp;
-		while (this.temperature > 0) {
-			annealRowsCols();
-			if (curViolationCount < solViolationCount || solViolationCount == -1) {
-				solViolationCount = curViolationCount;
-				solTentsPlaced = this.gameGrid.getTents().size();
-				this.updateSolutionPairings();
-			}
-			this.temperature -= this.coolingRate;
-		}
-
-	}
-
-	public void solveWithIssues(String inputFile, String outputFile) {
-		double initialTemp = this.temperature;
-		this.solViolationCount = this.curViolationCount;
-		this.solTentsPlaced = this.gameGrid.getTents().size();
-		this.updateSolutionPairings();
-		//		this.updateCurPairings();
-		while (this.temperature > 0) {
-			annealTrees();
-			if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
-				this.solViolationCount = this.curViolationCount;
-				this.solTentsPlaced = this.gameGrid.getTents().size();
-				this.updateSolutionPairings();
-			}
-			//			this.updateCurPairings();
-			//			this.curOutputToFile(outputFile);
-			//			this.printCurOutput();
-			//			System.out.println();
-			//			Verifier curVerify = new Verifier(inputFile, outputFile);
-			this.temperature -= this.coolingRate;
-		}
-		if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
-			this.solViolationCount = this.curViolationCount;
-			this.solTentsPlaced = this.gameGrid.getTents().size();
-			this.updateSolutionPairings();
-		}
-		//		this.updateCurPairings();
-		//		this.curOutputToFile(outputFile);
-		//		this.printCurOutput();
-		System.out.println("attempting to reload current solution");
-		//		this.printGrid();
-		this.reloadSolution(inputFile);
-		this.printGrid();
-		ArrayList<Cell> availableCells2 = new ArrayList<Cell>();
-		for (int row = 0; row < this.rows; row++) {
-			for (int col = 0; col < this.cols; col++) {
-				Cell cell = this.gameGrid.getCell(row, col);
-				if (!this.availableCells.contains(cell)) {
-					availableCells2.add(this.gameGrid.getCell(row, col));
-				}
-			}
-		}
-		availableCells2.removeAll(this.gameGrid.getTrees());
-		this.availableCells.clear();
-		this.availableCells = availableCells2;
-		this.temperature = initialTemp;
-		this.updateCurPairings();
-		this.curOutputToFile(outputFile);
-		this.printCurOutput();
-		System.out.println();
-		Verifier curVerify = new Verifier(inputFile, outputFile);
-		while (this.temperature > 0) {
-			annealRowsCols();
-			if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
-				this.solViolationCount = this.curViolationCount;
-				this.solTentsPlaced = this.gameGrid.getTents().size();
-				this.updateSolutionPairings();
-			}
-			this.temperature -= this.coolingRate;
-		}
-	}
-
+	// ~ ~ ~ Solve Methods ~ ~ ~ //
+	
+	/**
+	 * Final Solve Function, Called from main, Begins annealing process.<br>
+	 * See Also: {@link #annealFull()}
+	 * @param inputFile
+	 * @param outputFile
+	 */
 	public void solveFull(String inputFile, String outputFile) {
 		this.solViolationCount = this.curViolationCount;
 		this.solTentsPlaced = this.gameGrid.getTents().size();
@@ -407,11 +228,6 @@ public class Solver {
 				this.solTentsPlaced = this.gameGrid.getTents().size();
 				this.updateSolutionPairings();
 			}
-			//			this.updateCurPairings();
-			//			this.curOutputToFile(outputFile);
-			//			this.printCurOutput();
-			//			System.out.println();
-			//			Verifier curVerify = new Verifier(inputFile, outputFile);
 			this.temperature -= this.coolingRate;
 		}
 		if (this.curViolationCount < this.solViolationCount || this.solViolationCount == -1) {
@@ -421,8 +237,7 @@ public class Solver {
 		}
 	}
 
-	//anneal methods
-
+	// ~ ~ ~ Anneal Methods ~ ~ ~ //
 	public void annealFull() {
 		int totalValidCells = this.availableCells.size();
 		Cell chosenCell = this.availableCells.get(this.rand.nextInt(0, totalValidCells));
@@ -454,7 +269,6 @@ public class Solver {
 		 * Case 10: ChosenCell is a tent with a pairing
 		 * 	Result: currently remove tent and it's pairing
 		 * */
-		//this.printGrid(chosenCell);
 		int violationChange = calcViolationChangeTrees(chosenCell, chosenPairTree);
 		if (this.rand.nextDouble() < this.acceptanceProb(violationChange)) {
 			this.curViolationCount += violationChange;
@@ -512,7 +326,6 @@ public class Solver {
 		 * else it should be an empty cell, do cases below
 		 * 	add a tent
 		 * */
-		//		this.printGrid(chosenCell);
 		int violationChange = calcViolationChangeRowsCols(chosenCell);
 		if (this.rand.nextDouble() < this.acceptanceProb(violationChange)) {
 			this.curViolationCount += violationChange;
@@ -520,7 +333,7 @@ public class Solver {
 		}
 	}
 
-	//generate initial solution methods
+	// ~ ~ ~ Initial Solution Methods ~ ~ ~ //
 
 	public void generateInitialSol() {
 		for (Cell tree : this.gameGrid.getTrees()) {
@@ -716,7 +529,7 @@ public class Solver {
 		}
 	}
 
-	//calc violation change methods
+	// ~ ~ ~ calc violation change methods ~ ~ ~ //
 
 	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
 	 * 
@@ -743,6 +556,8 @@ public class Solver {
 	 * 	Result: remove tent
 	 * Case 10: ChosenCell is a tent with a pairing
 	 * 	Result: currently remove tent and it's pairing
+	 * 
+	 * If something has gone wrong, odds are its around here.
 	 * */
 	public int calcViolationChangeTrees(Cell changeCell, Cell pairTree) {
 		int violationChange = 0;
@@ -827,7 +642,8 @@ public class Solver {
 		return violationChange;
 	}
 
-	/*Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
+	/*
+	 * Calculates the violation count change if a cell is to be adjusted and it's pairing should it have one
 	 * 
 	 * if chosenCell is tent
 	 * delete the tent
@@ -858,7 +674,7 @@ public class Solver {
 		return violationChange;
 	}
 
-	//other methods
+	// ~ ~ ~ Misc Methods ~ ~ ~ //
 
 	public void updateSolutionPairings() {
 		int linesToWrite = this.gameGrid.getTents().size();
@@ -910,7 +726,7 @@ public class Solver {
 		this.curViolationCount = violationCount;
 	}
 
-	//When done running, pairing in the maps should no longer exist, neither 
+	// When done running, pairing in the maps should no longer exist. 
 	public void decouplePairings(Cell tent, Cell tree) {
 		if (this.tentTreeMap.containsKey(tent)) {
 			this.treeTentMap.remove(this.tentTreeMap.get(tent));
@@ -921,7 +737,11 @@ public class Solver {
 		this.tentTreeMap.remove(tent);
 		this.treeTentMap.remove(tree);
 	}
-
+	
+	/**
+	 * Outputs to a file. 
+	 * @param outputFile
+	 */
 	public void outputToFile(String outputFile) {
 		try (FileWriter writer = new FileWriter("data/" + outputFile)) {
 			writer.write(this.solViolationCount + "\n");
@@ -938,6 +758,10 @@ public class Solver {
 		}
 	}
 
+	/**
+	 * Reads input from official input. 
+	 * @param inputFile
+	 */
 	public void readInput(String inputFile) {
 		try (Scanner sc = new Scanner(new File("data/" + inputFile))) {
 			this.rows = Integer.parseInt(sc.next());
@@ -970,7 +794,7 @@ public class Solver {
 		}
 	}
 
-	// ~ ~ ~ Utilites ~ ~ ~ //
+	// ~ ~ ~ Utilities ~ ~ ~ //
 
 	/**
 	 * Should be used as follows:
@@ -1024,6 +848,10 @@ public class Solver {
 
 	//Testing methods
 
+	/**
+	 * Updates all parings to trivial paring locations<br>
+	 * 
+	 */
 	public void updateCurPairings() {
 		int linesToWrite = this.gameGrid.getTents().size();
 		int curLine = 0;

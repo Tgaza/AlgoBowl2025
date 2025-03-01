@@ -265,9 +265,12 @@ public class InputGenerator {
 			System.out.println("failed to output to file, msg- " + e.getMessage());
 		}
 	}
-
+	
+	
+	// ~ ~ ~ UNUSED ~ ~ ~ //
 	/**
 	 * Creates a unique ID for each created file <br>
+	 * <b>UNUSED</b><br>
 	 * eg:<br>
 	 *  gen2_300x300_postparams_HasTents_(SpecialFlag?_)17189_tdowd.txt
 	 * @param currentGen Current Generation, should be updated occasionally.
