@@ -13,26 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
- * -TODO: Create new Offical Folder to pull solutions/Inputfiles from
- * -TODO: Ensure one indexed output !!!
- * 
- * 
- * -TODO: Incorect num of violations <- INVALID
- * -TODO: Tent Superposition (Tent cannot overlap with existing entity) <- INVALID
- * -TODO: Cant Fall off edge of world <- INVALID
- * -TODO: Tent cannot be paired with non-tree entity <-INVALID
- * -TODO: File must have proper formatting + No missing/corrupt data <- INVALID
- * 
- * 
- * -TODO: Cant be an unpaired entity <- Violation
- * -TODO: Multiple adjenecies != multiple violations (Specifially with Tents) <- Violation
- * -TODO: A row or column which has too many or too few tents causes multiple violations: one violation for each tent to many or too few<- Violation 
- * 
- * When complete, "todo" -> "fixme"
+ *  verify all outputs
  */
 public class Verifier {
+	// ~ ~ ~ Variable Declaration ~ ~ ~ //
 	private GameGrid grid;
 	private Scanner scanner;
 	
@@ -54,8 +39,7 @@ public class Verifier {
 	private int actualTentCount = 0;
 	
 	public static void main(String[] args) {
-		//this is some temporary bull shit just to get the program to run with files plugged in manually
-		//replace with args[0] and args[1] later
+		//this is some temporary bullshit just to get the program to run with files plugged in manually
 		
 		String baseInput = "officialInputs/input_group";
 		String baseOut = "BestSoFar/output_from_991_to_";
@@ -71,7 +55,7 @@ public class Verifier {
 		}
 	}
 	
-	//Main code for running the verifier
+	//Primary code for running the verifier
 	public Verifier(String inputFile, String outputFile) {
 		super();
 		//for the time being the arguments are being left out intentionally
@@ -97,11 +81,6 @@ public class Verifier {
 		//Total number of violations made
 		int totalViolations = rowViolations + columnViolations + adjViolations + pairViolations;
 		
-		//just for testing purposes
-//		System.out.println(rowViolations);
-//		System.out.println(columnViolations);
-//		System.out.println(adjViolations);
-//		System.out.println(pairViolations);
 		System.out.println("Total Violations: " + totalViolations);
 		
 		if(totalViolations != claimedViolations) {
@@ -114,46 +93,6 @@ public class Verifier {
 		System.out.println();
 		
 	}
-	
-	//These functions are used for debugging purposes
-	//Prints out a copy of the input file
-//	private void printGrid() {
-//		for(int r = 0; r < rows; r++) {
-//			System.out.print(desiredTentRowCount[r] + " ");
-//		}
-//		
-//		System.out.println();
-//		
-//		for(int c = 0; c < columns; c++) {
-//			System.out.print(desiredTentColumnCount[c] + " ");
-//		}
-//		
-//		System.out.println();
-//		
-//		for(int r = 0; r < rows; r++) {
-//			for(int c = 0; c < columns; c++) {
-//				System.out.print(grid.getCell(r, c).getSymbol());
-//			}
-//			System.out.println();
-//		}
-//		
-//		System.out.println();
-//	}
-	
-	//Prints out a list of the detected counts of tents for each set of rows and columns
-//	private void printTentCounts() {
-//		for(int r = 0; r < rows; r++) {
-//			System.out.print(tentRowCount[r] + " ");
-//		}
-//		
-//		System.out.println();
-//		
-//		for(int c = 0; c < columns; c++) {
-//			System.out.print(tentColumnCount[c] + " ");
-//		}
-//		
-//		System.out.println();
-//	}
 	
 	//If an issue with the output file is found, the program exits with printed statement
 	private void exitProgram() {
@@ -449,10 +388,6 @@ public class Verifier {
 		
 		//go line by line reading tent placement coordinates and the direction of the associated tree
 		placeTents();
-		
-		//Methods used for testing
-		//printGrid();
-		//printTentCounts();
 		
 	}
 	

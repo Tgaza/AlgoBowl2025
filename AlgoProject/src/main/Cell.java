@@ -8,11 +8,9 @@
 package main;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Grid Node. 
- * 
  */
 public class Cell {
 	private int row, col;
